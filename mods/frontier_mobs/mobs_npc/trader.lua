@@ -236,6 +236,9 @@ trader_names_items.items = items
 				end
 			end
 			local pos = self.object:get_pos()
+			if pos == nil then
+				return
+			end
 			local ll = minetest.get_node_light(pos)
 			if ll == nil then
 				return
