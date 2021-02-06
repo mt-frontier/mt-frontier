@@ -1660,6 +1660,11 @@ function mob_class:general_attack()
 	end
 
 	local s = self.object:get_pos()
+	
+	if s == nil then
+		return
+	end
+
 	local objs = minetest.get_objects_inside_radius(s, self.view_range)
 
 	-- remove entities we aren't interested in
@@ -1843,7 +1848,9 @@ function mob_class:follow_flop()
 
 		local s = self.object:get_pos()
 		local players = minetest.get_connected_players()
-
+		if s == nil then
+			return
+		end
 		for n = 1, #players do
 
 			if get_distance(players[n]:get_pos(), s) < self.view_range

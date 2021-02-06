@@ -109,9 +109,9 @@ minetest.register_tool("crops:hydrometer", {
 minetest.register_craft({
 	output = "crops:watering_can",
 	recipe = {
-		{ "default:steel_ingot", "", "" },
-		{ "default:steel_ingot", "", "default:steel_ingot" },
-		{ "", "default:steel_ingot", "" },
+		{ "group:ingot", "", "" },
+		{ "group:ingot", "", "group:ingot" },
+		{ "", "group:ingot", "" },
 	},
 })
 

@@ -244,6 +244,12 @@ trader_names_items.items = items
 				return
 			end
 			if ll <= 2 then
+				local objects = minetest.get_objects_inside_radius(self.object:get_pos(), 6)
+				for _, ob_refs in ipairs(objects) do
+					if minetest.is_player(ob_ref) then
+						return
+					end
+				end
 				self.object:remove()
 			end
 		end,
