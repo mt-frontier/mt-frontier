@@ -244,9 +244,10 @@ trader_names_items.items = items
 				return
 			end
 			if ll <= 2 then
-				local objects = minetest.get_objects_inside_radius(self.object:get_pos(), 6)
-				for _, ob_refs in ipairs(objects) do
+				local objects = minetest.get_objects_inside_radius(self.object:get_pos(), 9)
+				for _, ob_ref in ipairs(objects) do
 					if minetest.is_player(ob_ref) then
+						print('player')
 						return
 					end
 				end
@@ -270,7 +271,7 @@ trader_names_items.items = items
 		neighbors = spawn_by,
 		interval = 87,
 		chance = 74000,
-		active_object_count = 5,
+		--active_object_count = 5,
 		min_height = 1,
 		max_height = 200,
 		day_toggle = true,
