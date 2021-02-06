@@ -72,3 +72,5 @@ dofile(minetest.get_modpath("buildings") .. "/cabin.lua")
 dofile(minetest.get_modpath("buildings") .. "/cache.lua")
 dofile(minetest.get_modpath("buildings") .. "/igloo.lua")
 dofile(minetest.get_modpath("buildings") .. "/wigwam.lua")
+dofile(minetest.get_modpath("buildings") .. "/saloon.lua")
+

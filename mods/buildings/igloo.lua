@@ -47,7 +47,7 @@ minetest.register_craft({
 })
 
 minetest.register_node("buildings:igloo_seed", {
-	description = "Placeholder for checking coditions for Cabin spawning",
+	description = "Placeholder for checking coditions for igloo spawning",
 	drawtype = "airlike",
 	groups = {not_in_creative_inventory = 1},
 })
@@ -57,7 +57,7 @@ minetest.register_decoration({
 	place_on = {"default:snowblock"},
 	decoration = "buildings:igloo_seed",
 	sidelen = 16,
-	fill_ratio = 0.0001,
+	fill_ratio = 0.0002,
 	y_max = 18,
 	y_min = 0,
 	--[[noise_params = {
@@ -77,7 +77,8 @@ minetest.register_lbm({
 	nodenames = {"buildings:igloo_seed"},
 	run_at_every_load = true,
 	action = function(pos, node)
-		minetest.remove_node(pos)	
+		minetest.remove_node(pos)
+		pos.y = pos.y - 1	
 		local get_node = minetest.get_node
 		local get_group = minetest.get_item_group
 		local corners = {}
@@ -87,8 +88,8 @@ minetest.register_lbm({
 		corners[4] = {x = pos.x + 12, y = pos.y, z = pos.z}
 		local function check_corners(pos)
 			for _, corner_pos in ipairs(corners) do
-				if get_group(get_node(corner_pos).name, "cools_lava") == 0 
-				and get_group(get_node(corner_pos).name, "soil") == 0 then
+				if get_group(get_node(corner_pos).name, "cools_lava") == 0 then
+				--and get_group(get_node(corner_pos).name, "snow") == 0 then
 					return false
 				end
 			end
