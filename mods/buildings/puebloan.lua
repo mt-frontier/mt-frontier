@@ -53,42 +53,23 @@ minetest.register_lbm({
 		local get_node = minetest.get_node
 		local get_group = minetest.get_item_group
 		pos.y = pos.y - 1
-		local corners = {}
-		corners[1]= {x = pos.x, y = pos.y, z = pos.z}
-		corners[2] = {x = pos.x + 5, y = pos.y, z = pos.z + 5}
-		corners[3] = {x = pos.x, y = pos.y, z = pos.z + 5}
-		corners[4] = {x = pos.x + 5, y = pos.y, z = pos.z}
-		local function check_corners(pos)
-			for _, corner_pos in ipairs(corners) do
-				if get_group(get_node(corner_pos).name, "cracky") == 0
-                and get_group(get_node(corner_pos).name, "crumbly") == 0 then
-					return false
-				end
-			end
-			return true
-		end
-		if check_corners(pos) == true then
-            local dir = 90 * math.random(0,3)
-			pos.y = pos.y + 1
-			minetest.place_schematic(pos, schem_file, dir, nil, true, {"place_center_x", "place_center_z", "place_center_y"})
-			local pos1 = corners[1]
-			local pos2 = corners[2]
-			pos2.y = pos2.y + 2
-			local chests = minetest.find_nodes_in_area(pos1, pos2, "default:chest")
-			if chests[1] ~= nil then
-				buildings.place_loot(chests[1], puebloan_loot)	
-			end
-            if math.random() < 0.5 then
-                return
-            end
-            pos.y = pos.y + 5
-            pos1.y = pos1.y + 5
-            pos2.y = pos2.y + 5
-            minetest.place_schematic(pos, schem_file, dir, nil, true, {"place_center_x", "place_center_z", "place_center_y"})
-            chests = minetest.find_nodes_in_area(pos1, pos2, "default:chest")
-			if chests[1] ~= nil then
-				buildings.place_loot(chests[1], puebloan_loot)	
-			end
-		end
+		if buildings.check_foundation(pos, 5, 5, {"cracky", "crumbly"}) < 4 then
+            return
+        end
+        local dir = 90 * math.random(0,3)
+        pos.y = pos.y + 1
+        minetest.place_schematic(pos, schem_file, dir, nil, true, {"place_center_x", "place_center_z", "place_center_y"})
+        
+        local chest_search_pos = {x = pos.x, y = pos.y + 1, z = pos.z}
+        buildings.find_and_place_loot("default:chest", puebloan_loot, chest_search_pos, 5, 5)
+
+        pos.y = pos.y + 5
+        chest_search_pos.y = chest_search_pos.y + 5
+        if buildings.check_foundation(pos, 5, 5, {"cracky", "crumbly"}) < 1 then
+            return
+        end
+        minetest.place_schematic(pos, schem_file, dir, nil, true, {"place_center_x", "place_center_z", "place_center_y"})
+        --chests = minetest.find_nodes_in_area(pos1, pos2, "default:chest")
+        buildings.find_and_place_loot("default:chest", puebloan_loot, chest_search_pos, 5, 5)
 	end,
 })

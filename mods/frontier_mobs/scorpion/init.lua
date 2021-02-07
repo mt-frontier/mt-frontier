@@ -4,7 +4,7 @@ mobs:register_mob('scorpion:little', {
    attack_type = 'dogfight',
    damage = 2,
    hp_min = 10, hp_max = 20,
-   collisionbox = {-0.6, -0.35, -0.5, 0.6, 0.3, 0.5},
+   collisionbox = {-0.3, -0.35, -0.3, 0.3, 0.3, 0.5},
    visual = 'mesh',
    mesh = 'scorpion_small.b3d',
    textures = {
@@ -43,10 +43,12 @@ mobs:register_mob('scorpion:little', {
 
 mobs:spawn({
    name = 'scorpion:little',
-   nodes = {'default:desert_sand', 'default:dirt_with_rainforest_litter', 'default:dry_dirt_with_grass'},
+   nodes = {'default:desert_sand', 'default:desert_stone', "default:sandstone", "default:sand"},
+   biomes = {"desert", "sandstone_desert"},
    min_height = -10,
    max_height = 200,
-   interval = 42,
-   chance = 20000,
+   max_light = 13,
+   interval = 17,
+   chance = 7000,
    active_object_count = 5,
 })

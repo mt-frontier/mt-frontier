@@ -20,7 +20,7 @@ function buildings.sort_loot(loot_table)
 	return new_table
 end
 
-local function select_loot(num_items, loot_table)
+local select_loot = function(num_items, loot_table)
 	print("selecting loot...")
 	local possible_loot = loot_table
 	local selected_loot = {}
@@ -37,7 +37,7 @@ local function select_loot(num_items, loot_table)
 	return selected_loot
 end
 
-function buildings.place_loot(pos, loot_table)
+buildings.place_loot = function(pos, loot_table)
 	local meta = minetest.get_meta(pos)
 	local inv = meta:get_inventory()
 	inv:set_size("main", 8*4)
@@ -68,12 +68,53 @@ function buildings.place_furnace_loot(pos)
 	meta:set_string("formspec", default.get_furnace_inactive_formspec())
 end
 
-function buildings.check_corners(pos, width, depth)
+function buildings.find_and_place_loot(lootable, loot, search_pos, width, depth)
+	assert(minetest.registered_nodes[lootable] ~= nil)
+	local corners = buildings.get_corners(search_pos, width, depth)
+	local pos1 = corners[1]
+	local pos2 = corners[2]
+	pos2.y = pos2.y + 1
+	local lootables = minetest.find_nodes_in_area(pos1, pos2, lootable)
+	if lootable == "default:furnace" then
+		for _, loot_spot in ipairs(lootables) do
+			buildings.place_furnace_loot(loot_spot)
+		end
+	else
+		for _, loot_spot in ipairs(lootables) do
+			buildings.place_loot(loot_spot, loot)
+		end
+	end
+end
+
+function buildings.get_corners(pos, width, depth)
 	local corners = {}
 	corners[1]= {x = pos.x, y = pos.y, z = pos.z}
 	corners[2] = {x = pos.x + width, y = pos.y, z = pos.z + depth}
 	corners[3] = {x = pos.x, y = pos.y, z = pos.z + depth}
 	corners[4] = {x = pos.x + width, y = pos.y, z = pos.z}
+	return corners
+end
+
+function buildings.check_foundation(pos, width, depth, groups)
+	local count = 0
+	local get_node = minetest.get_node
+	local get_group = minetest.get_item_group
+	local corners = buildings.get_corners(pos, width, depth)
+	if type(groups) ~= "table" then
+		groups = {groups}
+	end
+	-- count how many corners match the defined groups
+	for _, corner_pos in ipairs(corners) do
+		for __, group in ipairs(groups) do
+			print(group, minetest.get_item_group(minetest.get_node(corner_pos).name, group))
+			if minetest.get_item_group(minetest.get_node(corner_pos).name, group) > 0 then
+				count = count + 1
+				break 
+			end
+		end
+	end
+	print(count)
+	return count
 end
 
 dofile(minetest.get_modpath("buildings") .. "/cabin.lua")
