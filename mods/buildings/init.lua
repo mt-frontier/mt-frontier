@@ -68,6 +68,14 @@ function buildings.place_furnace_loot(pos)
 	meta:set_string("formspec", default.get_furnace_inactive_formspec())
 end
 
+function buildings.check_corners(pos, width, depth)
+	local corners = {}
+	corners[1]= {x = pos.x, y = pos.y, z = pos.z}
+	corners[2] = {x = pos.x + width, y = pos.y, z = pos.z + depth}
+	corners[3] = {x = pos.x, y = pos.y, z = pos.z + depth}
+	corners[4] = {x = pos.x + width, y = pos.y, z = pos.z}
+end
+
 dofile(minetest.get_modpath("buildings") .. "/cabin.lua")
 dofile(minetest.get_modpath("buildings") .. "/cache.lua")
 dofile(minetest.get_modpath("buildings") .. "/igloo.lua")

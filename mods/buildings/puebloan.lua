@@ -6,7 +6,7 @@ local puebloan_loot = {
 	{"bows:arrow_steel", 9, 8},
 	{"bows:arrow", 48, 5},
 	{"bows:arrow_poison", 9, 10},
-	{"default:pick_stone", 1, 8},
+	{"default:pick_bronze", 1, 8},
 	{"default:axe_stone", 1, 9},
 	{"frontier_trees:apple", 9, 7},
 	{"farming:seed_cotton", 9, 8},
@@ -30,7 +30,7 @@ minetest.register_decoration({
 	place_on = {"group:sand"},
 	decoration = "buildings:puebloan_seed",
 	sidelen = 16,
-	fill_ratio = 0.0001,
+	fill_ratio = 0.0003,
 	--[[noise_params = {
 		offset = 0,
 		scale = 0.01,
@@ -39,6 +39,7 @@ minetest.register_decoration({
 		octaves = 2,
 		persist = 0.6
 	},]]--
+	y_min = 10,
 	biomes = {"sandstone_desert", "desert"},
 })
 
