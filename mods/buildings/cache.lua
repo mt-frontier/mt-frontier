@@ -56,13 +56,7 @@ minetest.register_lbm({
 		pos.y = pos.y - 1
 		minetest.place_schematic(pos, schem_file, "random", nil, true, {"place_center_x", "place_center_z", "place_center_y"})
 		pos.y = pos.y + 6
-		print(minetest.pos_to_string(pos))
-		local pos1 = {x = pos.x - 2, y = pos.y - 1, z = pos.z - 2}
-		local pos2 = {x = pos.x + 2, y = pos.y + 1, z = pos.z + 2}
-		local chests = minetest.find_nodes_in_area(pos1, pos2, "default:chest")
-		if chests[1] ~= nil then
-			buildings.place_loot(chests[1], cache_loot)	
-		end
+		buildings.find_and_place_loot("default:chest", cache_loot, pos, 3, 3)
 	end,
 })
 

@@ -52,37 +52,14 @@ minetest.register_lbm({
 	run_at_every_load = true,
 	action = function(pos, node)
 		minetest.remove_node(pos)	
-		local get_node = minetest.get_node
-		local get_group = minetest.get_item_group
-		local corners = {}
 		pos.y = pos.y - 1
-		corners[1]= {x = pos.x, y = pos.y, z = pos.z}
-		corners[2] = {x = pos.x + 12, y = pos.y, z = pos.z + 12}
-		corners[3] = {x = pos.x, y = pos.y, z = pos.z + 12}
-		corners[4] = {x = pos.x + 12, y = pos.y, z = pos.z}
-		local function check_corners(pos)
-			for _, corner_pos in ipairs(corners) do
-				if get_group(get_node(corner_pos).name, "soil") == 0 then
-					return false
-				end
-			end
-			return true
+		if buildings.check_foundation(pos, 12, 12, "soil") < 4 then
+			return
 		end
-		if check_corners(pos) == true then
-			minetest.place_schematic(pos, schem_file, "random", nil, true, {"place_center_x", "place_center_z", "place_center_y"})
-			local pos1 = corners[1]
-			
-			local pos2 = corners[2]
-			pos2.y = pos2.y + 2
-			local chests = minetest.find_nodes_in_area(pos1, pos2, "default:chest")
-			if chests[1] ~= nil then
-				buildings.place_loot(chests[1], cabin_loot)	
-			end
-			local furnace = minetest.find_nodes_in_area(pos1, pos2, "default:furnace")
-			if furnace[1] ~= nil then
-				buildings.place_furnace_loot(furnace[1])
-			end
-		end
+		minetest.place_schematic(pos, schem_file, "random", nil, true, {"place_center_x", "place_center_z", "place_center_y"})
+		storage_search_pos = {x = pos.x, y = pos.y + 1, z = pos.z}
+		buildings.find_and_place_loot("default:chest", cabin_loot, storage_search_pos, 12, 12)
+		buildings.find_and_place_loot("default:furnace", nil, storage_search_pos, 12, 12)
 	end,
 })
 
