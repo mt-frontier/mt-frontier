@@ -60,21 +60,16 @@ minetest.register_lbm({
 			end
 			return true
 		end
-		if check_corners(pos) == true then
-			minetest.place_schematic(pos, schem_file, "random", nil, true, {"place_center_x", "place_center_z", "place_center_y"})
-			local pos1 = corners[1]
-			pos1.y = pos1.y + 7
-			local pos2 = corners[2]
-			pos2.y = pos2.y + 7
-			local chests = minetest.find_nodes_in_area(pos1, pos2, "default:chest")
-			if chests[1] ~= nil then
-				buildings.place_loot(chests[1], saloon_loot)	
-			end
-            local furnace = minetest.find_nodes_in_area(pos1, pos2, "default:furnace")
-			if furnace[1] ~= nil then
-				buildings.place_furnace_loot(furnace[1])
-			end
+		if buildings.check_foundation(pos, 12, 12, "soil") < 4 then
+			return
 		end
+		minetest.place_schematic(pos, schem_file, "random", nil, true, {"place_center_x", "place_center_z", "place_center_y"})
+		local storage_search_pos = {x = pos.x, y = pos.y + 1, z = pos.z} 
+		buildings.find_and_place_loot("ts_furniture:frontier_trees_mesquite_wood_cabinet_closed", saloon_loot, storage_search_pos, 12, 12)
+		
+		storage_search_pos.y = storage_search_pos.y + 6
+		buildings.find_and_place_loot("default:chest", saloon_loot, storage_search_pos, 12, 12)
+		buildings.find_and_place_loot("default:furnace", saloon_loot, storage_search_pos, 12, 12)
 	end,
 })
 
