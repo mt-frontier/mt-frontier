@@ -25,7 +25,7 @@ minetest.register_decoration({
 	place_on = {"default:dirt_with_dry_grass"},
 	decoration = "buildings:saloon_seed",
 	sidelen = 16,
-	fill_ratio = 0.0001,
+	fill_ratio = 0.00009,
 	--[[noise_params = {
 		offset = 0,
 		scale = 0.01,
@@ -43,23 +43,8 @@ minetest.register_lbm({
 	nodenames = {"buildings:saloon_seed"},
 	run_at_every_load = true,
 	action = function(pos, node)
-		minetest.remove_node(pos)	
-		local get_node = minetest.get_node
-		local get_group = minetest.get_item_group
+		minetest.remove_node(pos)
 		pos.y = pos.y - 1
-		local corners = {}
-		corners[1]= {x = pos.x, y = pos.y, z = pos.z}
-		corners[2] = {x = pos.x + 12, y = pos.y, z = pos.z + 12}
-		corners[3] = {x = pos.x, y = pos.y, z = pos.z + 12}
-		corners[4] = {x = pos.x + 12, y = pos.y, z = pos.z}
-		local function check_corners(pos)
-			for _, corner_pos in ipairs(corners) do
-				if get_group(get_node(corner_pos).name, "soil") == 0 then
-					return false
-				end
-			end
-			return true
-		end
 		if buildings.check_foundation(pos, 12, 12, "soil") < 4 then
 			return
 		end

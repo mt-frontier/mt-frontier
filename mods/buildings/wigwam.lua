@@ -48,35 +48,14 @@ minetest.register_lbm({
 	nodenames = {"buildings:wigwam_seed"},
 	run_at_every_load = true,
 	action = function(pos, node)
-		minetest.remove_node(pos)	
-		local get_node = minetest.get_node
-		local get_group = minetest.get_item_group
-		pos.y = pos.y - 1
-		local corners = {}
-		corners[1]= {x = pos.x, y = pos.y, z = pos.z}
-		corners[2] = {x = pos.x + 8, y = pos.y, z = pos.z + 8}
-		corners[3] = {x = pos.x, y = pos.y, z = pos.z + 8}
-		corners[4] = {x = pos.x + 8, y = pos.y, z = pos.z}
-		local function check_corners(pos)
-			for _, corner_pos in ipairs(corners) do
-				if get_group(get_node(corner_pos).name, "soil") == 0 then
-					return false
-				end
-			end
-			return true
+		minetest.remove_node(pos)
+		if buildings.check_foundation(pos, 5, 5, "soil") < 4 then
+			return
 		end
-		if check_corners(pos) == true then
-			pos.y = pos.y + 1
-			minetest.place_schematic(pos, schem_file, "random", nil, true, {"place_center_x", "place_center_z", "place_center_y"})
-			local pos1 = corners[1]
-			
-			local pos2 = corners[2]
-			pos2.y = pos2.y + 2
-			local chests = minetest.find_nodes_in_area(pos1, pos2, "default:chest")
-			if chests[1] ~= nil then
-				buildings.place_loot(chests[1], wigwam_loot)	
-			end
-		end
+		pos.y = pos.y + 1 -- place above ground level
+		minetest.place_schematic(pos, schem_file, "random", nil, true, {"place_center_x", "place_center_z", "place_center_y"})
+		local storage_search_pos = {x = pos.x, y = pos.y, z = pos.z}
+		buildings.find_and_place_loot("default:chest", wigwam_loot, storage_search_pos, 5, 5)
 	end,
 })
 

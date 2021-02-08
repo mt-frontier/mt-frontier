@@ -49,9 +49,7 @@ minetest.register_lbm({
 	nodenames = {"buildings:puebloan_seed"},
 	run_at_every_load = true,
 	action = function(pos, node)
-		minetest.remove_node(pos)	
-		local get_node = minetest.get_node
-		local get_group = minetest.get_item_group
+		minetest.remove_node(pos)
 		pos.y = pos.y - 1
 		if buildings.check_foundation(pos, 5, 5, {"cracky", "crumbly"}) < 4 then
             return
