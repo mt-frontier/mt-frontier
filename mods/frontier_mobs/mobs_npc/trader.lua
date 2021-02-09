@@ -269,9 +269,9 @@ trader_names_items.items = items
 		name = "mobs_npc:trader_"..trader_type,
 		nodes = {"group:soil"},
 		neighbors = spawn_by,
-		interval = 87,
+		interval = 77,
 		chance = 74000,
-		--active_object_count = 5,
+		active_object_count = 8,
 		min_height = 1,
 		max_height = 200,
 		day_toggle = true,
@@ -279,8 +279,8 @@ trader_names_items.items = items
 
 end
 
-register_trader("prospector", {"mobs_prospector.png"}, mobs.traders.prospector, {}, {"group:cracky"})
-register_trader("homesteader", {"mobs_homesteader.png"}, mobs.traders.homesteader, {}, {"group:choppy", "groups:flower", "groups:mushroom", "groups:flora", "groups:plant"})
+register_trader("prospector", {"mobs_prospector.png"}, mobs.traders.prospector, {}, {"group:cracky", "group:choppy"})
+register_trader("homesteader", {"mobs_homesteader.png"}, mobs.traders.homesteader, {}, {"group:choppy", "group:flower", "group:mushroom", "group:flora", "group:plant"})
 register_trader("hunter", {"mobs_hunter.png"}, mobs.traders.hunter, {}, {"group:snappy"})
 
 

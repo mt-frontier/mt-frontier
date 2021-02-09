@@ -1,7 +1,6 @@
 
 local S = mobs.intllib
 
-
 -- Warthog originally by KrupnoPavel, B3D model by sirrobzeroone
 
 mobs:register_mob("mobs_animal:pumba", {
@@ -88,12 +87,9 @@ mobs:spawn({
 	--day_toggle = true,
 })
 
-
 mobs:register_egg("mobs_animal:pumba", S("Warthog"), "mobs_pumba_inv.png")
 
-
 mobs:alias_mob("mobs:pumba", "mobs_animal:pumba") -- compatibility
-
 
 -- raw porkchop
 minetest.register_craftitem(":mobs:pork_raw", {
