@@ -256,14 +256,14 @@ function ts_furniture.register_furniture(recipe, description, texture)
 					meta:set_string("owner", owner)
 					meta:set_string("infotext", "Owned by ".. owner)
 					local player_meta = clicker:get_meta()
-					local storage = player_meta:get_string("storage")
-					if storage == "" then
-						storage = {}
-					else
-						storage = minetest.deserialize(storage)
-					end
-					table.insert(storage, pos)
-					player_meta:set_string("storage", minetest.serialize(storage))
+					--local storage = player_meta:get_string("storage")
+					--if storage == "" then
+					--	storage = {}
+					--else
+					--	storage = minetest.deserialize(storage)
+					--end
+					--table.insert(storage, pos)
+					--player_meta:set_string("storage", minetest.serialize(storage))
 				end
 				if name ~= owner and string.match(state.name, "_closed") then
 					local wield = clicker:get_wielded_item():get_name()
