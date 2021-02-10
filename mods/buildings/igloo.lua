@@ -12,9 +12,9 @@ local igloo_loot = {
 	{"fire:flint_and_steel", 1, 6},
 	{"craftguide:book", 1, 10},
 	{"frontier_guns:shotgun_shell", 3, 14},
-	{"frontier_guns:shotgun", 1, 72},
+	{"frontier_guns:shotgun", 1, 64},
 	{"frontier_guns:bullet", 2, 40},
-	{"frontier_guns:revolver", 1, 99},
+	{"frontier_guns:revolver", 1, 72},
 	{"mobs:meat", 9, 6},
 }
 
@@ -78,39 +78,15 @@ minetest.register_lbm({
 	run_at_every_load = true,
 	action = function(pos, node)
 		minetest.remove_node(pos)
-		pos.y = pos.y - 1	
-		local get_node = minetest.get_node
-		local get_group = minetest.get_item_group
-		local corners = {}
-		corners[1]= {x = pos.x, y = pos.y, z = pos.z}
-		corners[2] = {x = pos.x + 12, y = pos.y, z = pos.z + 12}
-		corners[3] = {x = pos.x, y = pos.y, z = pos.z + 12}
-		corners[4] = {x = pos.x + 12, y = pos.y, z = pos.z}
-		local function check_corners(pos)
-			for _, corner_pos in ipairs(corners) do
-				if get_group(get_node(corner_pos).name, "cools_lava") == 0 then
-				--and get_group(get_node(corner_pos).name, "snow") == 0 then
-					return false
-				end
-			end
-			return true
+		pos.y = pos.y - 1
+		if buildings.check_foundation(pos, 12, 12, "cools_lava") < 4 then
+			return
 		end
-		if check_corners(pos) == true then
-			pos.y = pos.y + 1
-			minetest.place_schematic(pos, schem_file, "random", nil, true, {"place_center_x", "place_center_z", "place_center_y"})
-			local pos1 = corners[1]
-			
-			local pos2 = corners[2]
-			pos2.y = pos2.y + 2
-			local chests = minetest.find_nodes_in_area(pos1, pos2, "default:chest")
-			if chests[1] ~= nil then
-				buildings.place_loot(chests[1], igloo_loot)	
-			end
-			local furnace = minetest.find_nodes_in_area(pos1, pos2, "default:furnace")
-			if furnace[1] ~= nil then
-				buildings.place_furnace_loot(furnace[1])
-			end
-		end
+		pos.y = pos.y + 1  -- Place above ground
+		minetest.place_schematic(pos, schem_file, "random", nil, true, {"place_center_x", "place_center_z", "place_center_y"})
+		local storage_search_pos = {x = pos.x, y = pos.y + 1, z = pos.z}
+		buildings.find_and_place_loot("default:chest", igloo_loot, storage_search_pos, 12, 12)
+		buildings.find_and_place_loot("default:furnace", nil, storage_search_pos, 12, 12)
 	end,
 })
 

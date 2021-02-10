@@ -11,7 +11,7 @@ mobs:register_mob('scorpion:little', {
       {'default_desert_sandstone.png'},
    },
    blood_texture = 'mobs_blood.png',
-   visual_size = {x=7,y=7},
+   visual_size = {x=7, y=7},
    makes_footstep_sound = true,
    sounds = {
       --war_cry = 'scorpion_squeak',
@@ -20,7 +20,7 @@ mobs:register_mob('scorpion:little', {
    run_velocity = 6,
    jump = true,
    stepheight = 1.7,
-   reach = 1,
+   reach = 1.5,
    view_range = 5,
    fear_height = 2,
    drops = {
@@ -43,9 +43,9 @@ mobs:register_mob('scorpion:little', {
 
 mobs:spawn({
    name = 'scorpion:little',
-   nodes = {'default:desert_sand', 'default:desert_stone', "default:sandstone", "default:sand"},
-   biomes = {"desert", "sandstone_desert"},
-   min_height = -10,
+   nodes = {'default:desert_sand', 'default:desert_stone', "default:sandstone", "default:sand", "default:dirt_with_dry_grass", "default:stone"},
+   biomes = {"desert", "sandstone_desert", "savanna"},
+   min_height = -20,
    max_height = 200,
    max_light = 13,
    interval = 17,

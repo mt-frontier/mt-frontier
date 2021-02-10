@@ -64,7 +64,7 @@ function buildings.place_furnace_loot(pos)
 	inv:set_size("src", 1)
 	inv:set_size("dst", 4)
 	local fuel_loot = "default:coal_lump "..math.random(1,99)
-	local ore_loot = {"default:tin_lump "..math.random(1,9), "default:copper_lump "..math.random(1,9), "default:gold_lump "..math.random(1,9)}
+	local ore_loot = {"default:tin_lump "..math.random(1,9), "default:copper_lump "..math.random(1,3), "default:gold_lump "..math.random(1,2)}
 	inv:set_stack("fuel", 1, fuel_loot)
 	inv:set_stack("src", 1, ore_loot[math.random(1, #ore_loot)])
 	meta:set_string("formspec", default.get_furnace_inactive_formspec())
