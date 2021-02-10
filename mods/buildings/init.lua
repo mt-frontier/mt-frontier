@@ -125,5 +125,5 @@ dofile(minetest.get_modpath("buildings") .. "/igloo.lua")
 dofile(minetest.get_modpath("buildings") .. "/wigwam.lua")
 dofile(minetest.get_modpath("buildings") .. "/saloon.lua")
 dofile(minetest.get_modpath("buildings") .. "/puebloan.lua")
-
+dofile(minetest.get_modpath("buildings") .. "/chapel.lua")
 
