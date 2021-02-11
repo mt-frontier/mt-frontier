@@ -9,9 +9,9 @@ dofile(mp .. "/xp.lua")
 dofile(mp .. "/acheivements.lua")
 local initial_items = {}
 
-initial_items.homesteader = {"mtcoin:gold 33", "mtcoin:copper 33", "farming:hoe_steel", "farming:seed_cotton 9", "crops:watering_can","default:shovel_bronze", "default:torch 9"}
-initial_items.hunter = {"mtcoin:copper 99", "frontier_trees:apple 9", "crops:pumpkin 3", "bows:arrow 9", "bows:bow_wood", "default:dagger_stone", "default:torch 9"}
-initial_items.prospector = {"mtcoin:gold 66", "farming:bread", "default:torch 18", "default:pick_steel"}
+initial_items.homesteader = {"farming:hoe_steel", "farming:seed_cotton 9", "crops:watering_can","default:shovel_bronze", "default:torch 9"}
+initial_items.hunter = {"frontier_trees:apple 9", "crops:pumpkin 3", "bows:arrow 9", "bows:bow_wood", "default:dagger_stone", "default:torch 9"}
+initial_items.prospector = {"farming:bread", "default:torch 18", "default:pick_steel"}
 
 local new_players = {}
 
@@ -51,6 +51,24 @@ local function set_skin(player)
 	end
 end
 
+local function get_set_coin(inv)
+	print("setting_coins")
+	local cents = 0
+	for i = 1, 2 do
+		local stack = inv:get_stack("purse", i)
+		local count = stack:get_count()
+		if stack:get_name() == "mtcoin:gold" then
+			count = count * 3
+		end
+		cents = cents + count
+	end
+	if cents < 45 then
+		inv:set_stack("purse", 1, "mtcoin:gold 15")
+		inv:set_stack("purse", 2, ItemStack())
+	end
+end
+
+
 local function set_initial_items(player)
 	local name = player:get_player_name()
 	local class = classes.get_class(player)
@@ -89,14 +107,6 @@ local function set_initial_items(player)
 		return "frontier_trees:apple " .. num
 	end
 
-	local function get_gold(xp)
-		local amt_gold = math.floor(0.03 * xp)
-		if amt_gold < 20 then
-			amt_gold = 20
-		end
-		return "mtcoin:gold " .. amt_gold
-	end
-	
 	local function get_materials(xps)
 		local materials = {}
 		local num, metal
@@ -225,7 +235,6 @@ local function set_initial_items(player)
 	
 	table.insert(initial_items, get_tool(class, get_tool_grade(class_xp)))
 	table.insert(initial_items, get_apples(xp))
-	table.insert(initial_items, get_gold(xp))
 	get_bonus(xp)
 	get_materials(class_xps)
 	initial_items[#initial_items + 1] = "default:torch 9"
@@ -236,19 +245,20 @@ end
 local function give_initial_items(player)
 	local name = player:get_player_name()
 	local inv = minetest.get_inventory({type="player", name = name})
+	get_set_coin(inv)
 	local initial_items = set_initial_items(player)
 	for _, itemstring in ipairs(initial_items) do
 		minetest.chat_send_player(name, itemstring.." added to inv")
 		local stack = ItemStack(itemstring)
-		if minetest.get_item_group(stack:get_name(), "coin") == 1 then
-			if string.match(itemstring, "gold") then
-				inv:set_stack("purse", 1, stack)
-			elseif string.match(itemstring, "copper") then
-				inv:set_stack("purse", 2, stack)
-			end
-		else
+	--	if minetest.get_item_group(stack:get_name(), "coin") == 1 then
+	--		if string.match(itemstring, "gold") then
+	--			inv:set_stack("purse", 1, stack)
+	--		elseif string.match(itemstring, "copper") then
+	--			inv:set_stack("purse", 2, stack)
+	--		end
+	--	else
 			inv:add_item("main", stack)
-		end
+		--end
 	end
 end
 
