@@ -21,7 +21,6 @@ function buildings.sort_loot(loot_table)
 end
 
 local select_loot = function(num_items, loot_table)
-	print("selecting loot...")
 	local possible_loot = loot_table
 	local selected_loot = {}
 	while #selected_loot < num_items do
@@ -33,7 +32,6 @@ local select_loot = function(num_items, loot_table)
 			end
 		end
 	end
-	print('done')
 	return selected_loot
 end
 
@@ -108,14 +106,12 @@ function buildings.check_foundation(pos, width, depth, groups)
 	-- count how many corners match the defined groups
 	for _, corner_pos in ipairs(corners) do
 		for __, group in ipairs(groups) do
-			print(group, minetest.get_item_group(minetest.get_node(corner_pos).name, group))
 			if minetest.get_item_group(minetest.get_node(corner_pos).name, group) > 0 then
 				count = count + 1
 				break 
 			end
 		end
 	end
-	print(count)
 	return count
 end
 

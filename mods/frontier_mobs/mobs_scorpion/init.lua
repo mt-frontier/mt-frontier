@@ -43,12 +43,12 @@ mobs:register_mob('scorpion:little', {
 
 mobs:spawn({
    name = 'scorpion:little',
-   nodes = {'default:desert_sand', 'default:desert_stone', "default:sandstone", "default:sand", "default:dirt_with_dry_grass", "default:stone"},
+   nodes = {'default:desert_sand', 'default:desert_stone', "default:sandstone", "default:sand", "default:dirt_with_dry_grass"},
    biomes = {"desert", "sandstone_desert", "savanna"},
    min_height = -20,
    max_height = 200,
    max_light = 13,
-   interval = 17,
+   interval = 37,
    chance = 7000,
    active_object_count = 5,
 })

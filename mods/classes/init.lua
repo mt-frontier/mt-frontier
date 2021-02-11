@@ -52,7 +52,6 @@ local function set_skin(player)
 end
 
 local function get_set_coin(inv)
-	print("setting_coins")
 	local cents = 0
 	for i = 1, 2 do
 		local stack = inv:get_stack("purse", i)

@@ -59,5 +59,3 @@ minetest.register_lbm({
 		buildings.find_and_place_loot("default:chest", cache_loot, pos, 3, 3)
 	end,
 })
-
-print("caches loaded")

@@ -290,7 +290,6 @@ function ts_furniture.register_furniture(recipe, description, texture)
 					"list[nodemeta:"..pos.x..","..pos.y..","..pos.z .. ";main;0,0;8,".. tostring(rows) ..";]"..
 					"list[current_player;main;0,"..tostring(rows + 1) ..";8,4;]"..
 					"listring[]"
-				print(node_name)	
 				if state.name == node_name:gsub("_open","_closed") then
 					minetest.swap_node(pos, {name = node_name:gsub("_closed", "_open"), param2 = state.param2})
 					minetest.show_formspec(name, "furniture_"..minetest.pos_to_string(pos), formspec)
@@ -327,7 +326,6 @@ function ts_furniture.register_furniture(recipe, description, texture)
 			node_def.can_dig = def.can_dig
 		end	
 		if def.toggle then
-			print("toggle")
 			local nn1 = node_name .."_closed"
 			local nn2 = node_name .. "_open"
 			minetest.register_node(":" .. nn1, node_def)
