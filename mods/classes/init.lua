@@ -322,33 +322,6 @@ minetest.register_on_joinplayer(function(player)
 	end)
 end)
 
-minetest.register_on_dieplayer(function(player)
-	local meta = player:get_meta()
-	local inv = minetest.get_inventory({type = "player", name = player:get_player_name()})
-	
-	--for list_name, list in pairs(inv:get_lists()) do
-	--	if list_name ~= "badges" then
-	--		for i = 1, inv:get_size(list_name) do
-	--			local stack = inv:get_stack(list_name, i)
-	--			local n = stack:get_count()
-	--			stack:take_item(n)
-	--			inv:set_stack(list_name, i, stack)
-	--		end
-	--	end
-	--end
-	--local storage = meta:get_string("storage")
-	--if storage ~= "" then
-	--	storage = minetest.deserialize(storage)
-	--	for _, pos in ipairs(storage) do
-	--		local node = minetest.get_node(pos)
-	--		minetest.set_node(pos, {name = node.name, param2 = node.param2})
-	--	end
-	--	meta:set_string("storage", "")
-	--end
-	meta:set_string("class", "") 
-	meta:set_string("gender", "")
-end)
-
 minetest.register_on_respawnplayer(function(player)
 	local meta = player:get_meta()
 	if meta:get_string("class") ~= "" then

@@ -82,7 +82,6 @@ minetest.register_lbm({
 		if buildings.check_foundation(pos, 12, 12, "cools_lava") < 4 then
 			return
 		end
-		pos.y = pos.y + 1  -- Place above ground
 		minetest.place_schematic(pos, schem_file, "random", nil, true, {"place_center_x", "place_center_z", "place_center_y"})
 		local storage_search_pos = {x = pos.x, y = pos.y + 1, z = pos.z}
 		buildings.find_and_place_loot("default:chest", igloo_loot, storage_search_pos, 12, 12)

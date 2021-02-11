@@ -50,7 +50,7 @@ frontier_trees.register_fence("poplar", "Poplar")
 
 local gen_poplar_tree = function ()
 	local schem = {}
-	schem.size = {x = 5, y = 12, z = 5}
+	schem.size = {x = 5, y = 11, z = 5}
 	schem.yslice_prob = {}
 	schem.yslice_prob[1] = {}
 	schem.yslice_prob[1].ypos = 2 
@@ -66,38 +66,36 @@ local gen_poplar_tree = function ()
 		for y = 1, schem.size.y do
 			for x = 1, schem.size.x do
 			--	leaves.param1 = 255
-				if y < 11 and x == math.ceil(1/2*schem.size.x) and z == math.ceil(1/2*schem.size.z) then
-					table.insert(schem.data, tree) 
-				elseif y == 12 then
+				if y < 10 and x == math.ceil(1/2*schem.size.x) and z == math.ceil(1/2*schem.size.z) then
+					table.insert(schem.data, tree)
+				elseif y == 11 then
 					if x == 3 and z == 3 then
 						table.insert(schem.data, leaves)
 					else
 						table.insert(schem.data, ignore)
 					end
-				elseif y == 11 then
-					if x == 1 or x == 5 or z == 1 or z == 5 then
-						table.insert(schem.data, ignore)
-					elseif x == 3 and z == 3 then
+				elseif y == 10 then
+					if x == 3 and z == 3 then
 						table.insert(schem.data, leaves)
-					elseif x == 3 or z == 3 then
-						table.insert(schem.data, corner_leaves)
+					elseif x > 1 and x < 5 and z > 1 and z < 5 then
+						table.insert(schem.data, edge_leaves)
 					else
 						table.insert(schem.data, ignore)
 					end
-				elseif y == 10 or y == 7 then
+				elseif y == 7 then
 					if (x == 2 and z == 3) or (x == 4 and z == 3) 
 					or (x == 3 and z == 2) or (x == 3 and z == 4)  then
 						table.insert(schem.data, edge_leaves)
 					else
 						table.insert(schem.data, ignore)
 					end
-				elseif y ==9 or y == 8 then
+				elseif y == 8 then
 					if x == 1 or x == 5 or z == 1 or z == 5 then
-						table.insert(schem.data, ignore)
-					else
 						table.insert(schem.data, edge_leaves)
+					else
+						table.insert(schem.data, leaves)
 					end
-				elseif y == 6 or y == 5 then
+				elseif y == 9 or y == 6 or y == 5 then
 					if (x == 1 and z == 1) or (x == 5 and z == 5) or (x == 1 and z == 5) or (x == 5 and z ==1) then
 						table.insert(schem.data, ignore)
 					elseif y == 6 then 
