@@ -23,8 +23,8 @@ minetest.register_decoration({
     --spawn_by = "default:water_source",
 	decoration = "buildings:shipwreck_seed",
 	sidelen = 16,
-	fill_ratio = 0.09,
-    y_max =-2,
+	fill_ratio = 0.0005,
+    y_max =-24,
     y_min = -130,
     flags = "force_placement"
 	--[[noise_params = {
@@ -44,13 +44,12 @@ minetest.register_lbm({
 	run_at_every_load = true,
 	action = function(pos, node)
 		minetest.remove_node(pos)
-        print(minetest.pos_to_string(pos, 0))
-
 		pos.y = pos.y - 1
-		if buildings.check_foundation(pos, 12, 12, {"sand", "soil", "water"}) < 4 then
+		if buildings.check_foundation(pos, 24, 24, {"sand", "soil"}) < 4 
+		and buildings.check_foundation(pos, 24, 24, "cracky") > 0 
+		and buildings.check_foundation(pos, 12, 12, "cracky") > 0 then
 			return
 		end
-        print("placed")
 		minetest.place_schematic(pos, schem_file, "random", nil, true, {"place_center_x", "place_center_z", "place_center_y"})
 		local storage_search_pos = {x = pos.x, y = pos.y, z = pos.z}
 		buildings.find_and_place_loot("default:chest", shipwreck_loot, storage_search_pos, 24, 24)
