@@ -57,7 +57,7 @@ minetest.register_lbm({
 			return
 		end
 		minetest.place_schematic(pos, schem_file, "random", nil, true, {"place_center_x", "place_center_z", "place_center_y"})
-		storage_search_pos = {x = pos.x, y = pos.y + 1, z = pos.z}
+		local storage_search_pos = {x = pos.x, y = pos.y + 1, z = pos.z}
 		buildings.find_and_place_loot("default:chest", cabin_loot, storage_search_pos, 12, 12)
 		buildings.find_and_place_loot("default:furnace", nil, storage_search_pos, 12, 12)
 	end,

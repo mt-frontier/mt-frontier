@@ -12,9 +12,9 @@ local igloo_loot = {
 	{"fire:flint_and_steel", 1, 6},
 	{"craftguide:book", 1, 10},
 	{"frontier_guns:shotgun_shell", 3, 14},
-	{"frontier_guns:shotgun", 1, 64},
-	{"frontier_guns:bullet", 2, 40},
-	{"frontier_guns:revolver", 1, 72},
+	{"frontier_guns:shotgun", 1, 48},
+	{"frontier_guns:bullet", 2, 20},
+	{"frontier_guns:revolver", 1, 64},
 	{"mobs:meat", 9, 6},
 }
 
