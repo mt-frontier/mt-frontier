@@ -17,7 +17,7 @@ mobs:register_mob('scorpion:little', {
       --war_cry = 'scorpion_squeak',
    },
    walk_velocity = 2,
-   run_velocity = 6,
+   run_velocity = 5,
    jump = true,
    stepheight = 1.7,
    reach = 1.5,
@@ -43,7 +43,7 @@ mobs:register_mob('scorpion:little', {
 
 mobs:spawn({
    name = 'scorpion:little',
-   nodes = {'default:desert_sand', 'default:desert_stone', "default:sandstone", "default:sand", "default:dirt_with_dry_grass"},
+   nodes = {'default:desert_sand', 'default:desert_stone', "default:sandstone", "default:dirt_with_dry_grass"},
    biomes = {"desert", "sandstone_desert", "savanna"},
    min_height = -20,
    max_height = 200,

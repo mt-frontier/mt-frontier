@@ -155,9 +155,13 @@ crops.can_grow = function(pos)
 	end
 	local planter = meta:get_string("planter") 
 	if planter ~= "" then
-		local class = classes.get_class(minetest.get_player_by_name(planter))
+		local player = minetest.get_player_by_name(planter)
+		if player == nil then
+			return true
+		end
+		local class = classes.get_class(player)
 		if class == "homesteader" then
-			classes.change_xp(minetest.get_player_by_name(planter), 1)
+			classes.change_xp(player, 1)
 		end
 	end
 	-- allow the plant to grow
