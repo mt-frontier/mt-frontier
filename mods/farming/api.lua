@@ -200,9 +200,11 @@ farming.grow_plant = function(pos, elapsed)
 	print(minetest.pos_to_string(pos))
 	local planter = meta:get_string("planter") 
 	if planter ~= "" then
-		print(planter)
-		--local player = minetest.get_player_by_name(planter)
-		local player = planter
+		minetest.log(planter)
+		local player = minetest.get_player_by_name(planter)
+		if player == nil then
+			return
+		end
 		local class = classes.get_class(player)
 		if class == "homesteader" then
 			classes.change_xp(player, 1)
