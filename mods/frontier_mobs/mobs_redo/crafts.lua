@@ -5,7 +5,7 @@ local S = mobs.intllib
 minetest.register_craftitem("mobs:nametag", {
 	description = S("Name Tag"),
 	inventory_image = "mobs_nametag.png",
-	groups = {flammable = 2}
+	groups = {flammable = 2, nametag = 1}
 })
 
 if minetest.get_modpath("dye") and minetest.get_modpath("farming") then
@@ -20,7 +20,7 @@ end
 minetest.register_craftitem("mobs:leather", {
 	description = S("Leather"),
 	inventory_image = "mobs_leather.png",
-	groups = {flammable = 2}
+	groups = {flammable = 2, leather = 1}
 })
 
 -- raw meat
@@ -119,7 +119,7 @@ minetest.register_craft({
 minetest.register_craftitem("mobs:saddle", {
 	description = S("Saddle"),
 	inventory_image = "mobs_saddle.png",
-	groups = {flammable = 2}
+	groups = {flammable = 2, saddle = 1}
 })
 
 minetest.register_craft({
@@ -130,6 +130,10 @@ minetest.register_craft({
 		{"mobs:leather", "default:steel_ingot", "mobs:leather"}
 	}
 })
+
+
+-- make sure we can register fences
+if default.register_fence then
 
 -- mob fence (looks like normal fence but collision is 2 high)
 default.register_fence("mobs:fence_wood", {
@@ -177,6 +181,9 @@ minetest.register_craft({
 	}
 })
 
+end
+
+
 -- items that can be used as fuel
 minetest.register_craft({
 	type = "fuel",
@@ -219,6 +226,7 @@ minetest.register_craft({
 	recipe = "mobs:fence_top",
 	burntime = 2
 })
+
 
 -- this tool spawns same mob and adds owner, protected, nametag info
 -- then removes original entity, this is used for fixing any issues.
@@ -294,8 +302,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	and fields.name
 	and fields.name ~= "" then
 
-		local name = player:get_player_name()
-
 		-- does mob still exist?
 		if not tex_obj
 		or not tex_obj:get_luaentity() then
@@ -310,8 +316,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		end
 
 		-- limit name entered to 64 characters long
-		if string.len(fields.name) > 64 then
-			fields.name = string.sub(fields.name, 1, 64)
+		if fields.name:len() > 64 then
+			fields.name = fields.name:sub(1, 64)
 		end
 
 		-- update texture
@@ -325,3 +331,25 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		tex_obj = nil
 	end
 end)
+
+
+-- Meat Block (thanks to painterlypack.net for allowing me to use these textures)
+minetest.register_node("mobs:meatblock", {
+	description = S("Meat Block"),
+	tiles = {"mobs_meat_top.png", "mobs_meat_bottom.png", "mobs_meat_side.png"},
+	paramtype2 = "facedir",
+	groups = {choppy = 1, oddly_breakable_by_hand = 1, flammable = 2},
+	sounds = default.node_sound_leaves_defaults(),
+	on_place = minetest.rotate_node,
+	on_use = minetest.item_eat(20),
+})
+
+minetest.register_craft({
+	output = "mobs:meatblock",
+	type = "shapeless",
+	recipe = {
+		"group:food_meat", "group:food_meat", "group:food_meat",
+		"group:food_meat", "group:food_meat", "group:food_meat",
+		"group:food_meat", "group:food_meat", "group:food_meat"
+	}
+})
