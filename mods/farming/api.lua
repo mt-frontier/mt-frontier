@@ -1,3 +1,7 @@
+-- farming/api.lua
+
+-- support for MT game translation.
+local S = farming.get_translator
 
 -- Wear out hoes, place soil
 -- TODO Ignore group:flower
@@ -78,7 +82,7 @@ farming.register_hoe = function(name, def)
 	end
 	-- Check def table
 	if def.description == nil then
-		def.description = "Hoe"
+		def.description = S("Hoe")
 	end
 	if def.inventory_image == nil then
 		def.inventory_image = "unknown_item.png"
@@ -174,12 +178,6 @@ farming.place_seed = function(itemstack, placer, pointed_thing, plantname)
 	-- add the node and remove 1 item from the itemstack
 	minetest.add_node(pt.above, {name = plantname, param2 = 1})
 	tick(pt.above)
-	print(minetest.pos_to_string(pt.above))
-	if minetest.is_player(placer) and classes.get_class(placer) == "homesteader"  then
-		local name = placer:get_player_name()
-		local meta = minetest.get_meta(pt.above)
-		meta:set_string("planter", name)
-	end
 	if not (creative and creative.is_enabled_for
 			and creative.is_enabled_for(player_name)) then
 		itemstack:take_item()
@@ -191,25 +189,12 @@ farming.grow_plant = function(pos, elapsed)
 	local node = minetest.get_node(pos)
 	local name = node.name
 	local def = minetest.registered_nodes[name]
-	
+
 	if not def.next_plant then
 		-- disable timer for fully grown plant
 		return
 	end
-	local meta = minetest.get_meta(pos)
-	print(minetest.pos_to_string(pos))
-	local planter = meta:get_string("planter") 
-	if planter ~= "" then
-		minetest.log(planter)
-		local player = minetest.get_player_by_name(planter)
-		if player == nil then
-			return
-		end
-		local class = classes.get_class(player)
-		if class == "homesteader" then
-			classes.change_xp(player, 1)
-		end
-	end
+
 	-- grow seed
 	if minetest.get_item_group(node.name, "seed") and def.fertility then
 		local soil_node = minetest.get_node_or_nil({x = pos.x, y = pos.y - 1, z = pos.z})
@@ -270,7 +255,10 @@ farming.register_plant = function(name, def)
 
 	-- Check def table
 	if not def.description then
-		def.description = "Seed"
+		def.description = S("Seed")
+	end
+	if not def.harvest_description then
+		def.harvest_description = pname:gsub("^%l", string.upper)
 	end
 	if not def.inventory_image then
 		def.inventory_image = "unknown_item.png"
@@ -340,7 +328,7 @@ farming.register_plant = function(name, def)
 
 	-- Register harvest
 	minetest.register_craftitem(":" .. mname .. ":" .. pname, {
-		description = pname:gsub("^%l", string.upper),
+		description = def.harvest_description,
 		inventory_image = mname .. "_" .. pname .. ".png",
 		groups = def.groups or {flammable = 2},
 	})
@@ -356,7 +344,7 @@ farming.register_plant = function(name, def)
 				{items = {mname .. ":" .. pname}, rarity = base_rarity},
 				{items = {mname .. ":" .. pname}, rarity = base_rarity * 2},
 				{items = {mname .. ":seed_" .. pname}, rarity = base_rarity},
-				{items = {mname .. ":seed_" .. pname .. " 2"}, rarity = base_rarity * 2},
+				{items = {mname .. ":seed_" .. pname}, rarity = base_rarity * 2},
 			}
 		}
 		local nodegroups = {snappy = 3, flammable = 2, plant = 1, not_in_creative_inventory = 1, attached_node = 1}
