@@ -4,7 +4,7 @@ end
 
 bows.on_hit_object=function(self,target,hp,user,lastpos)
 	local hp2=target:get_hp()-hp
-	local class = classes.get_class(user)
+	--local class = classes.get_class(user)
 	--target:set_hp(hp2)
 	target:punch(user,1,{full_punch_interval=1,damage_groups={fleshy=self.dmg}},nil)
 	if hp2>0 then

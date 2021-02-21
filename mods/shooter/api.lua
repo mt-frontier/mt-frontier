@@ -249,7 +249,7 @@ shooter.punch_object = function(object, tool_caps, dir, on_blast, shooter)
 		end
 	end
 	if do_damage then
-		local class = classes.get_class(shooter)
+	--local class = classes.get_class(shooter)
 		for k, v in pairs(groups) do
 			tool_caps.damage_groups[k] = v * config.damage_multiplier
 			--if class == "hunter" then
