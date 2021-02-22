@@ -462,10 +462,10 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 					inv:remove_item("main", price)
 					if minetest.get_item_group(ItemStack(goods):get_name(), "coin") == 1 then
 						inv:add_item("purse", goods)
-						local class = classes.get_class(player)
-						if class == "trader" then
-							classes.change_xp(player, mtcoin.coin_to_xp(ItemStack(goods)))
-						end
+						--local class = classes.get_class(player)
+						--if class == "trader" then
+						--	classes.change_xp(player, mtcoin.coin_to_xp(ItemStack(goods)))
+						--end
 					else
 						leftover = inv:add_item("main", goods)
 
