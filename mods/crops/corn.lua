@@ -35,7 +35,7 @@ minetest.register_node("crops:corn", {
 		if minetest.get_item_group(under.name, "soil") <= 1 then
 			return
 		end
-		crops.plant(placer, pointed_thing.above, {name="crops:corn_base_seed", param2 = 3})
+		crops.plant(pointed_thing.above, {name="crops:corn_base_seed", param2 = 3})
 		if not minetest.settings:get_bool("creative_mode") then
 			itemstack:take_item()
 		end
@@ -57,7 +57,7 @@ minetest.register_craft({
 minetest.register_craftitem("crops:corn_on_the_cob", {
 	description = S("Corn on the Cob"),
 	inventory_image = "crops_corn_on_the_cob.png",
-	on_use = minetest.item_eat(2)
+	on_use = minetest.item_eat(1)
 })
 
 minetest.register_craft({

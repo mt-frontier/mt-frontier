@@ -14,7 +14,7 @@ mobs:register_mob('scorpion:little', {
    visual_size = {x=7, y=7},
    makes_footstep_sound = true,
    sounds = {
-      --war_cry = 'scorpion_squeak',
+      war_cry = 'scorpion_squeak2',
    },
    walk_velocity = 2,
    run_velocity = 5,

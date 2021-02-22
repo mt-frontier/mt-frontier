@@ -37,7 +37,7 @@ minetest.register_node("crops:potato_eyes", {
 		if minetest.get_item_group(under.name, "soil") <= 1 then
 			return
 		end
-		crops.plant(placer, pointed_thing.above, {name="crops:potato_plant_1", param2 = 3})
+		crops.plant(pointed_thing.above, {name="crops:potato_plant_1", param2 = 3})
 		if not minetest.settings:get_bool("creative_mode") then
 			itemstack:take_item()
 		end

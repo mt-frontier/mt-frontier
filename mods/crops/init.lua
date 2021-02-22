@@ -113,16 +113,12 @@ crops.register = function(plantdef)
 	table.insert(crops.plants, plantdef)
 end
 
-crops.plant = function(planter, pos, node)
+crops.plant = function(pos, node)
 	minetest.set_node(pos, node)
 	local meta = minetest.get_meta(pos)
 	local plant = find_plant(node)
 	meta:set_int("crops_water", math.max(plant.properties.waterstart, 1))
 	meta:set_int("crops_damage", 0)
-	local class = classes.get_class(planter) 
-	if class == "homesteader" then
-		meta:set_string("planter", planter:get_player_name())
-	end
 end
 
 crops.can_grow = function(pos)
@@ -153,17 +149,7 @@ crops.can_grow = function(pos)
 			return false
 		end
 	end
-	local planter = meta:get_string("planter") 
-	if planter ~= "" then
-		local player = minetest.get_player_by_name(planter)
-		if player == nil then
-			return true
-		end
-		local class = classes.get_class(player)
-		if class == "homesteader" then
-			classes.change_xp(player, 1)
-		end
-	end
+
 	-- allow the plant to grow
 	return true
 end
