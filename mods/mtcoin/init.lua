@@ -310,13 +310,13 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			trader_meta:set_string("trade_list", minetest.serialize(trade_list))
 			refresh_trade_inventory(trader, player)
 			minetest.chat_send_player(trader:get_player_name(), player:get_player_name() .. " bought ".. stack:get_name() .. " from you.")
-			if trader:get_player_name() ~= player:get_player_name() then
-				local class = classes.get_class(trader)
-				if class ~= "trader" then
-					return
-				end
-				classes.change_xp(trader, mtcoin.coin_to_xp(price))
-			end
+			--if trader:get_player_name() ~= player:get_player_name() then
+			--	local class = classes.get_class(trader)
+			--	if class ~= "trader" then
+			--		return
+			--	end
+			--	classes.change_xp(trader, mtcoin.coin_to_xp(price))
+			--end
 		end	
 	end
 	
