@@ -263,14 +263,14 @@ trader_names_items.items = items
 
 	mobs:register_mob("mobs_npc:trader_"..trader_type, default_def)
 
-	mobs:register_egg("mobs_npc:trader_"..trader_type, S("Trader"), "default_sandstone.png", 1)
+	--mobs:register_egg("mobs_npc:trader_"..trader_type, S("Trader"), "default_sandstone.png", 1)
 
 	mobs:spawn({
 		name = "mobs_npc:trader_"..trader_type,
 		nodes = {"group:soil"},
 		neighbors = spawn_by,
-		interval = 77,
-		chance = 74000,
+		interval = 57,
+		chance = 48000,
 		active_object_count = 8,
 		min_height = 1,
 		max_height = 200,
