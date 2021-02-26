@@ -118,71 +118,52 @@ farming.register_hoe = function(name, def)
 	end
 end
 
--- how often node timers for plants will tick, +/- some random value
-local function tick(pos)
-	minetest.get_node_timer(pos):start(math.random(166, 286))
-end
--- how often a growth failure tick is retried (e.g. too dark)
-local function tick_again(pos)
-	minetest.get_node_timer(pos):start(math.random(40, 80))
-end
-
--- Seed placement
-farming.place_seed = function(itemstack, placer, pointed_thing, plantname)
-	local pt = pointed_thing
-	-- check if pointing at a node
-	if not pt then
-		return itemstack
-	end
-	if pt.type ~= "node" then
-		return itemstack
-	end
-
-	local under = minetest.get_node(pt.under)
-	local above = minetest.get_node(pt.above)
-
-	local player_name = placer and placer:get_player_name() or ""
-
-	if minetest.is_protected(pt.under, player_name) then
-		minetest.record_protection_violation(pt.under, player_name)
-		return
-	end
-	if minetest.is_protected(pt.above, player_name) then
-		minetest.record_protection_violation(pt.above, player_name)
+-- Regulate soil node by moisture level. Used by abm in nodes.lua
+function farming.update_soil(pos, node) 
+	local n_def = minetest.registered_nodes[node.name] or nil
+	local wet = n_def.soil.wet or nil
+	local base = n_def.soil.base or nil
+	local dry = n_def.soil.dry or nil
+	if not n_def or not n_def.soil or not wet or not base or not dry then
 		return
 	end
 
-	-- return if any of the nodes is not registered
-	if not minetest.registered_nodes[under.name] then
-		return itemstack
+	pos.y = pos.y + 1
+	local nn = minetest.get_node_or_nil(pos)
+	if not nn or not nn.name then
+		return
 	end
-	if not minetest.registered_nodes[above.name] then
-		return itemstack
-	end
+	local nn_def = minetest.registered_nodes[nn.name] or nil
+	pos.y = pos.y - 1
 
-	-- check if pointing at the top of the node
-	if pt.above.y ~= pt.under.y+1 then
-		return itemstack
+	if nn_def and nn_def.walkable and minetest.get_item_group(nn.name, "plant") == 0 then
+		minetest.set_node(pos, {name = base})
+		return
 	end
+	-- check if there is water nearby
+	local wet_lvl = minetest.get_item_group(node.name, "wet")
+	if minetest.find_node_near(pos, 3, {"group:water"}) then
+		-- if it is dry soil and not base node, turn it into wet soil
+		if wet_lvl == 0 then
+			minetest.set_node(pos, {name = wet})
+		end
+	else
+		-- only turn back if there are no unloaded blocks (and therefore
+		-- possible water sources) nearby
+		if not minetest.find_node_near(pos, 3, {"ignore"}) then
+			-- turn it back into base if it is already dry
+			if wet_lvl == 0 then
+				-- only turn it back if there is no plant/seed on top of it
+				if minetest.get_item_group(nn.name, "plant") == 0 and minetest.get_item_group(nn.name, "seed") == 0 then
+					minetest.set_node(pos, {name = base})
+				end
 
-	-- check if you can replace the node above the pointed node
-	if not minetest.registered_nodes[above.name].buildable_to then
-		return itemstack
+			-- if its wet turn it back into dry soil
+			elseif wet_lvl == 1 then
+				minetest.set_node(pos, {name = dry})
+			end
+		end
 	end
-
-	-- check if pointing at soil
-	if minetest.get_item_group(under.name, "soil") < 2 then
-		return itemstack
-	end
-
-	-- add the node and remove 1 item from the itemstack
-	minetest.add_node(pt.above, {name = plantname, param2 = 1})
-	tick(pt.above)
-	if not (creative and creative.is_enabled_for
-			and creative.is_enabled_for(player_name)) then
-		itemstack:take_item()
-	end
-	return itemstack
 end
 
 farming.grow_plant = function(pos, elapsed)
