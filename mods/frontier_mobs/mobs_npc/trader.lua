@@ -12,31 +12,28 @@ mobs.traders.hunter = {
 	},
 
 	items = {
-		{"mtcoin:gold 3", "default:gold_ingot 1", 3},
-		{"mtcoin:copper 3", "default:copper_ingot 1", 2},
-		{"mtcoin:copper 6", "default:steel_ingot 1", 3},
-		{"frontier_trees:apple 9", "mtcoin:gold 6", 10},
+		--{item for sale, price, inverse probability of appearing in trader's inventory}
+		-- Items for sale
 		{"default:clay 10", "mtcoin:gold 6", 12},
 		{"default:sand 9", "mtcoin:gold 6", 17},
 		{"farming:wheat 10", "mtcoin:gold 6", 17},
 		{"default:stick 4", "mtcoin:gold 1", 20},
-		{"default:desert_stone 10", "mtcoin:gold 24", 27},
-		{"default:pick_stone 1", "mtcoin:gold 6", 2},
-		{"default:dagger_stone 1", "mtcoin:gold 4", 6},
-		{"default:shovel_stone 1", "mtcoin:gold 3", 6},
-		{"default:axe_stone 1", "mtcoin:gold 6", 3},
 		{"default:cactus 2", "mtcoin:gold 3", 40},
 		{"bows:bow_wood 1", "mtcoin:gold 15", 2},
 		{"bows:arrow 9", "mtcoin:gold 9", 2},
 		{"crops:corn 1", "mtcoin:gold 1", 5},
 		{"crops:pumpkin 1", "mtcoin:gold 1", 5},
-		{"mtcoin:copper 9", "default:stone 99", 6},
-		{"mtcoin:copper 3", "mobs:chicken_feather 1", 4},
 		{"bows:arrow_toxic 9", "mtcoin:gold 24", 8},
+
+		--Items to buy
+		{"mtcoin:gold 3", "default:gold_ingot 1", 3},
+		{"mtcoin:copper 3", "default:copper_ingot 1", 2},
+		{"mtcoin:copper 6", "default:steel_ingot 1", 3},
+		{"mtcoin:copper 3", "default:tin_ingot 3", 4},
+		{"mtcoin:copper 10", "default:stone 99", 6},
+		{"mtcoin:copper 3", "mobs:chicken_feather 1", 4},
+		
 		{"mtcoin:gold 2", "mobs:cheese 1", 5},
-		{"mtcoin:gold 10", "vessels:apple_butter_jar 1", 8},
-		{"mtcoin:gold 10", "vessels:blueberry_jam_jar 1", 8},
-		{"mtcoin:gold 10", "vessels:maple_syrup_jar 1", 8},
 	}
 }
 
@@ -47,15 +44,10 @@ mobs.traders.homesteader = {
 
 	items = {
 		--{item for sale, price, inverse probability of appearing in trader's inventory}
-		{"mtcoin:gold 3", "default:gold_ingot 1", 2},
-		{"mtcoin:copper 3", "default:copper_ingot 1", 2},
-		{"mtcoin:copper 6", "default:steel_ingot 1", 3},
-		{"farming:bread 9", "mtcoin:gold 12", 5},
-		--{"default:clay 10", "mtcoin:gold 6", 12},
-		{"default:brick 10", "mtcoin:gold 12", 17},
-		--{"default:sand 9", "mtcoin:gold 6", 17},
-		{"farming:seed_wheat 4", "mtcoin:gold 1", 17},
-		{"mtcoin:gold 1", "farming:wheat 9", 4},
+		-- Items for sale
+		{"default:brick 10", "mtcoin:gold 9", 17},
+		{"farming:seed_wheat 9", "mtcoin:copper 1", 17},
+		{"farming:bread 9", "mtcoin:gold 11", 5},
 		{"default:tree 5", "mtcoin:gold 12", 20},
 		{"default:stone 10", "mtcoin:gold 24", 17},
 		{"default:desert_stone 10", "mtcoin:gold 24", 27},
@@ -68,11 +60,8 @@ mobs.traders.homesteader = {
 		{"crops:potato 1", "mtcoin:gold 1", 5},
 		{"crops:green_bean", "mtcoin:gold 1", 5},
 		{"crops:watering_can 1", "mtcoin:gold 12", 3},
-		{"crops:hydrometer 1", "mtcoin:gold 9", 6},
+		{"crops:hydrometer 1", "mtcoin:gold 9", 3},
 		{"farming:seed_cotton 3", "mtcoin:gold 1", 6},
-		{"mtcoin:copper 1", "default:dirt 99", 11},
-		{"mtcoin:copper 6", "mobs:meat 1", 4},
-		{"mtcoin:copper 6", "mobs:pork_cooked 1", 4},
 		{"mobs:lasso 1", "mtcoin:gold 9", 6},
 		{"mobs:net 1", "mtcoin:gold 3", 6},
 		{"mobs:saddle 1", "mtcoin:gold 15", 6},
@@ -84,6 +73,15 @@ mobs.traders.homesteader = {
 		{"mobs_animal:cow", "mtcoin:gold 99", 9},
 		{"mobs_animal:chicken", "mtcoin:gold 18", 7},
 		{"mobs:chicken_feather 9","mtcoin:gold 1", 6},
+
+		--Items to buy 
+		{"mtcoin:gold 3", "default:gold_ingot 1", 2},
+		{"mtcoin:copper 3", "default:copper_ingot 1", 2},
+		{"mtcoin:copper 6", "default:steel_ingot 1", 3},
+		{"mtcoin:gold 1", "farming:wheat 9", 4},
+		{"mtcoin:copper 1", "default:dirt 99", 11},
+		{"mtcoin:copper 6", "mobs:meat 1", 4},
+		{"mtcoin:copper 6", "mobs:pork_cooked 1", 4},
 	}
 }
 
@@ -93,34 +91,36 @@ mobs.traders.prospector = {
 
 	items = {
 		--{item for sale, price, chance of appearing in trader's inventory}
-		{"mtcoin:gold 3", "default:gold_ingot 1", 2},
-		{"mtcoin:copper 3", "default:copper_ingot 1", 2},
-		{"mtcoin:gold 4", "farming:bread 3", 5},
-		{"default:stone 10", "mtcoin:gold 24", 17},
-		{"default:desert_stone 10", "mtcoin:gold 24", 27},
+		-- Items for sale
 		{"default:pick_steel 1", "mtcoin:gold 10", 3},
 		{"default:dagger_steel 1", "mtcoin:gold 8", 4},
 		{"default:shovel_steel 1", "mtcoin:gold 7", 6},
 		{"default:axe_steel 1", "mtcoin:gold 10", 5},
 		{"default:coal_lump 9", "mtcoin:gold 9", 8},
-		{"default:furnace 1", "mtcoin:gold 9", 5},
 		{"default:iron_lump 9", "mtcoin:gold 18", 8},
 		{"default:torch 9", "mtcoin:gold 12", 5},
 		{"mtcoin:gold 12", "mobs:leather", 4},
 		{"default:obsidian 1", "mtcoin:gold 9", 50},
+		{"frontier_guns:revolver 1", "mtcoin:gold 496", 17},
+		{"frontier_guns:bullet 1", "mtcoin:gold 18", 12},
+	
+		-- Items to buy
+		{"mtcoin:gold 3", "default:gold_ingot 1", 2},
+		{"mtcoin:copper 3", "default:copper_ingot 1", 2},
+		{"mtcoin:gold 4", "farming:bread 3", 5},
+		
 		{"mtcoin:gold 3", "mobs:pork_cooked 1", 6},
 		{"mtcoin:gold 3", "mobs:rabbit_hide 1", 12},
 		{"mtcoin:copper 1", "crops:melon_slice", 6},
 		{"mtcoin:gold 5", "pies:baked_apple_pie 1", 8},
 		{"mtcoin:gold 8", "pies:baked_blueberry_pie 1", 8},
-		{"mtcoin:gold 13", "pies:baked_pumpkin_pie 1", 8},
+		{"mtcoin:gold 12", "pies:baked_pumpkin_pie 1", 8},
 		{"mtcoin:gold 16", "pies:baked_chicken_pie 1", 6},
-		{"frontier_guns:revolver 1", "mtcoin:gold 496", 27},
-		{"frontier_guns:bullet 1", "mtcoin:gold 18", 19},
+		
 		{"mtcoin:gold 2", "mobs:cheese 1", 5},
-		{"mtcoin:gold 10", "vessels:apple_butter_jar 1", 8},
-		{"mtcoin:gold 10", "vessels:blueberry_jam_jar 1", 8},
-		{"mtcoin:gold 10", "vessels:maple_syrup_jar 1", 8},
+		{"mtcoin:gold 9", "vessels:apple_butter_jar 1", 8},
+		{"mtcoin:gold 9", "vessels:blueberry_jam_jar 1", 8},
+		{"mtcoin:gold 9", "vessels:maple_syrup_jar 1", 8},
 	}
 }
 
@@ -145,7 +145,6 @@ local function sort_items(item_table)
 			end
 		end
 	end
-
 	return new_table
 end
 
