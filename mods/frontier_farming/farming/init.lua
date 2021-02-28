@@ -93,7 +93,6 @@ minetest.register_craft({
 	}
 })
 
-
 -- Straw
 
 minetest.register_craft({
@@ -111,7 +110,6 @@ minetest.register_craft({
 		{"farming:straw"},
 	}
 })
-
 
 -- Fuels
 
