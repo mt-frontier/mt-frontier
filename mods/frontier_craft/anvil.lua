@@ -1,13 +1,16 @@
 adv_craft.anvil = {}
 adv_craft.anvil.recipes = {}
 		local formspec = "size[8,9]" ..
-			"list[detached:anvil;out;0,1;8,2;]" ..
-			"label[1,0;Available Crafts: Based on player's skill and inventory]" ..
+			"label[1.5,0;Available crafts based on player's skill and inventory]" ..
+			--"list[detached:anvil;in;3.5,1;1,1;]" ..
+			--"label[3.35,2;Place ingots]" ..
+			"list[detached:anvil;out;1.5,1;5,3;]" ..
 			"list[current_player;main;0,5;8,4;]"
 
 function adv_craft.anvil.register_craft(output, inputs)
 	adv_craft.anvil.recipes[output] = inputs
 end
+
 local function can_craft(player, inputs)
 	if type(inputs) == "table" then
 		for i, item in ipairs(inputs) do
@@ -68,11 +71,11 @@ minetest.register_node("adv_craft:anvil", {
         },
 	groups = {cracky = 2},
 	on_rightclick = function(pos, node, clicker)
-		anvil_inv = minetest.create_detached_inventory("anvil",{
+		anvil_inv = minetest.create_detached_inventory("anvil", {
 				allow_move = function()
 					return 0
 				end,
-				allow_put = function()
+				allow_put = function(inv, listname, index, stack, player)
 					return 0
 				end,
 				allow_take = function()
@@ -97,7 +100,7 @@ minetest.register_node("adv_craft:anvil", {
 			}, 
 			clicker:get_player_name()
 		)
-		anvil_inv:set_size("out", 16)
+		anvil_inv:set_size("out", 15)
 		adv_craft.anvil.predict_craft(pos,clicker)
 		minetest.show_formspec(clicker:get_player_name(), clicker:get_player_name()..":anvil", formspec)
 	end,
@@ -127,6 +130,4 @@ adv_craft.anvil.register_toolset("steel")
 
 adv_craft.anvil.register_craft("default:pick_steel", {"default:steel_ingot 3", "default:stick"})
 
-for k, v in pairs(adv_craft.anvil.recipes) do
-	print(k)
-end
+
