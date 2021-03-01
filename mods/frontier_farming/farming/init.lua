@@ -94,7 +94,6 @@ minetest.register_craft({
 })
 
 -- Straw
-
 minetest.register_craft({
 	output = "farming:straw 3",
 	recipe = {
@@ -112,7 +111,6 @@ minetest.register_craft({
 })
 
 -- Fuels
-
 minetest.register_craft({
 	type = "fuel",
 	recipe = "farming:straw",

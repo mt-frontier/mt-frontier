@@ -110,11 +110,11 @@ function adv_craft.anvil.register_toolset(material)
 	local craft_material = "default:"..material.."_ingot"
 	local tools = {
 		--{toolname, number of craft material required}
-		{"default:dagger_" .. material, 1},
-		{"default:pick_" .. material, 3}, 
-		{"default:axe_" .. material, 3},
-		{"default:shovel_" .. material, 1},
-		{"farming:hoe_" .. material, 2},
+		{"frontier_tools:" .. material .. "_knife", 1},
+		{"frontier_tools:" .. material .. "_pick", 3},
+		{"frontier_tools:" .. material .. "_axe", 3},
+		{"frontier_tools:" .. material .. "_shovel", 1},
+		{"frontier_tools:" .. material .. "_hoe", 2},
 	}
 	for n = 1, #tools do
 		adv_craft.anvil.register_craft(
@@ -125,9 +125,9 @@ function adv_craft.anvil.register_toolset(material)
 end
 
 adv_craft.anvil.register_toolset("tin")
-adv_craft.anvil.register_toolset("bronze")
+--adv_craft.anvil.register_toolset("bronze")
 adv_craft.anvil.register_toolset("steel")
 
-adv_craft.anvil.register_craft("default:pick_steel", {"default:steel_ingot 3", "default:stick"})
+--adv_craft.anvil.register_craft("default:pick_steel", {"default:steel_ingot 3", "default:stick"})
 
 
