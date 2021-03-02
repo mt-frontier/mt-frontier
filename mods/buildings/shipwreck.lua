@@ -23,7 +23,7 @@ minetest.register_decoration({
     --spawn_by = "default:water_source",
 	decoration = "buildings:shipwreck_seed",
 	sidelen = 16,
-	fill_ratio = 0.0005,
+	fill_ratio = 0.0002,
     y_max =-24,
     y_min = -130,
     flags = "force_placement"
@@ -53,6 +53,8 @@ minetest.register_lbm({
 		minetest.place_schematic(pos, schem_file, "random", nil, true, {"place_center_x", "place_center_z", "place_center_y"})
 		local storage_search_pos = {x = pos.x, y = pos.y, z = pos.z}
 		buildings.find_and_place_loot("default:chest", shipwreck_loot, storage_search_pos, 24, 24)
+		storage_search_pos.y = storage_search_pos.y + 4
+		buildings.find_and_place_loot("ts_furniture:frontier_trees_cypress_wood_cabinet_closed", shipwreck_loot, storage_search_pos, 24, 24)
 	end,
 })
 
