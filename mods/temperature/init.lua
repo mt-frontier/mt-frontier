@@ -1,8 +1,8 @@
 local huds = {}
 local temp_tick = 5
-local freezing_temp = 35
+local freezing_temp = 40
 local overheating_temp = 80
-local temp_exhaust_lvl = 5
+local base_exhaust_level = 5
 
 local function get_temp(player)
 	local pos = player:get_pos()
@@ -46,6 +46,20 @@ local function get_temp(player)
 	temp = temp + heat - cool	
 	return temp
 end
+
+local function get_exhaustion_level(temp)
+	local exhaust_level = base_exhaust_level
+	local diff = 0
+	if temp <= freezing_temp then
+		diff = math.ceil((freezing_temp - temp)/10)
+	elseif temp >= overheating_temp then
+		diff = math.ceil((overheating_temp - temp)/10)
+	else
+		exhaust_level = 0
+	end
+	return exhaust_level
+end
+
 function get_hud_defs(player)
 	local temp = get_temp(player)
 	local far = math.floor(temp)
@@ -116,9 +130,8 @@ minetest.register_globalstep(function(dt)
 			local temp = get_temp(player)
 			huds_update(player)	
 			if minetest.get_modpath("stamina") then
-				if temp <= freezing_temp or temp >= overheating_temp then
-					stamina.exhaust_player(player, temp_exhaust_lvl, "temperature")
-				end
+				local exhaust_level = get_exhaustion_level(temp)
+				stamina.exhaust_player(player, exhaust_level, "temperature")
 			end
 		end	
 		temp_timer = 0
