@@ -13,11 +13,12 @@ function stamina.log(level, message, ...)
 end
 
 local function get_setting(key, default)
-	local setting = minetest.settings:get("stamina." .. key)
-	if setting and not tonumber(setting) then
-		stamina.log("warning", "Invalid value for setting %s: %q. Using default %q.", key, setting, default)
+	local value = minetest.settings:get("stamina." .. key)
+	local num_value = tonumber(value)
+	if value and not num_value then
+		stamina.log("warning", "Invalid value for setting %s: %q. Using default %q.", key, value, default)
 	end
-	return tonumber(setting) or default
+	return num_value or default
 end
 
 stamina.settings = {
@@ -28,6 +29,7 @@ stamina.settings = {
 	sprint_lvl = get_setting("sprint_lvl", 6),
 	sprint_speed = get_setting("sprint_speed", 0.8),
 	sprint_jump = get_setting("sprint_jump", 0.1),
+	sprint_with_fast = minetest.settings:get_bool("stamina.sprint_with_fast", false),
 	tick = get_setting("tick", 800),
 	tick_min = get_setting("tick_min", 4),
 	health_tick = get_setting("health_tick", 4),
@@ -51,38 +53,56 @@ local settings = stamina.settings
 
 local attribute = {
 	saturation = "stamina:level",
-	hud_id = "stamina:hud_id",
 	poisoned = "stamina:poisoned",
 	exhaustion = "stamina:exhaustion",
 }
 
 local function is_player(player)
 	return (
-		player and
-		not player.is_fake_player and
-		player.get_attribute and  -- check for pipeworks fake player
-		player.is_player and
-		player:is_player()
+		minetest.is_player(player) and
+		not player.is_fake_player
 	)
 end
 
-local function get_int_attribute(player, key)
-	local level = player:get_attribute(key)
-	if level then
-		return tonumber(level)
+local function set_player_attribute(player, key, value)
+	if player.get_meta then
+		if value == nil then
+			player:get_meta():set_string(key, "")
+		else
+			player:get_meta():set_string(key, tostring(value))
+		end
 	else
-		return nil
+		player:set_attribute(key, value)
 	end
 end
+
+local function get_player_attribute(player, key)
+	if player.get_meta then
+		return player:get_meta():get_string(key)
+	else
+		return player:get_attribute(key)
+	end
+end
+
+local hud_ids_by_player_name = {}
+
+local function get_hud_id(player)
+	return hud_ids_by_player_name[player:get_player_name()]
+end
+
+local function set_hud_id(player, hud_id)
+	hud_ids_by_player_name[player:get_player_name()] = hud_id
+end
+
 --- SATURATION API ---
 function stamina.get_saturation(player)
-	return get_int_attribute(player, attribute.saturation)
+	return tonumber(get_player_attribute(player, attribute.saturation))
 end
 
 function stamina.set_saturation(player, level)
-	player:set_attribute(attribute.saturation, level)
+	set_player_attribute(player, attribute.saturation, level)
 	player:hud_change(
-		player:get_attribute(attribute.hud_id),
+		get_hud_id(player),
 		"number",
 		math.min(settings.visual_max, level)
 	)
@@ -130,21 +150,23 @@ stamina.change = stamina.change_saturation -- for backwards compatablity
 --- END SATURATION API ---
 --- POISON API ---
 function stamina.is_poisoned(player)
-	return player:get_attribute(attribute.poisoned) == "yes"
+	return get_player_attribute(player, attribute.poisoned) == "yes"
 end
 
 function stamina.set_poisoned(player, poisoned)
+	local hud_id = get_hud_id(player)
 	if poisoned then
-		player:hud_change(player:get_attribute(attribute.hud_id), "text", "stamina_hud_poison.png")
-		player:set_attribute(attribute.poisoned, "yes")
+		player:hud_change(hud_id, "text", "stamina_hud_poison.png")
+		set_player_attribute(player, attribute.poisoned, "yes")
 	else
-		player:hud_change(player:get_attribute(attribute.hud_id), "text", "stamina_hud_fg.png")
-		player:set_attribute(attribute.poisoned, "no")
+		player:hud_change(hud_id, "text", "stamina_hud_fg.png")
+		set_player_attribute(player, attribute.poisoned, "no")
 	end
 end
 
-local function poison_tick(player, ticks, interval, elapsed)
-	if not stamina.is_poisoned(player) then
+local function poison_tick(player_name, ticks, interval, elapsed)
+	local player = minetest.get_player_by_name(player_name)
+	if not player or not stamina.is_poisoned(player) then
 		return
 	elseif elapsed > ticks then
 		stamina.set_poisoned(player, false)
@@ -153,7 +175,7 @@ local function poison_tick(player, ticks, interval, elapsed)
 		if hp > 0 then
 			player:set_hp(hp)
 		end
-		minetest.after(interval, poison_tick, player, ticks, interval, elapsed + 1)
+		minetest.after(interval, poison_tick, player_name, ticks, interval, elapsed + 1)
 	end
 end
 
@@ -173,7 +195,8 @@ function stamina.poison(player, ticks, interval)
 		return
 	end
 	stamina.set_poisoned(player, true)
-	poison_tick(player, ticks, interval, 0)
+	local player_name = player:get_player_name()
+	poison_tick(player_name, ticks, interval, 0)
 end
 --- END POISON API ---
 --- EXHAUSTION API ---
@@ -189,11 +212,11 @@ stamina.exhaustion_reasons = {
 }
 
 function stamina.get_exhaustion(player)
-	return get_int_attribute(player, attribute.exhaustion)
+	return tonumber(get_player_attribute(player, attribute.exhaustion))
 end
 
 function stamina.set_exhaustion(player, exhaustion)
-	player:set_attribute(attribute.exhaustion, exhaustion)
+	set_player_attribute(player, attribute.exhaustion, exhaustion)
 end
 
 stamina.registered_on_exhaust_players = {}
@@ -321,7 +344,7 @@ local function move_tick()
 			local can_sprint = (
 				controls.aux1 and
 				not player:get_attach() and
-				not minetest.check_player_privs(player, {fast = true}) and
+				(settings.sprint_with_fast or not minetest.check_player_privs(player, {fast = true})) and
 				stamina.get_saturation(player) > settings.sprint_lvl
 			)
 
@@ -423,7 +446,13 @@ function minetest.do_item_eat(hp_change, replace_with_item, itemstack, player, p
 	end
 
 	local itemname = itemstack:get_name()
-	stamina.log("action", "%s eats %s for %s stamina.", player:get_player_name(), itemname, hp_change)
+	if replace_with_item then
+		stamina.log("action", "%s eats %s for %s stamina, replace with %s",
+			player:get_player_name(), itemname, hp_change, replace_with_item)
+	else
+		stamina.log("action", "%s eats %s for %s stamina",
+			player:get_player_name(), itemname, hp_change)
+	end
 	minetest.sound_play("stamina_eat", {to_player = player:get_player_name(), gain = 0.7})
 
 	if hp_change > 0 then
@@ -487,14 +516,22 @@ minetest.register_on_joinplayer(function(player)
 		size = {x = 24, y = 24},
 		text = "stamina_hud_fg.png",
 		number = level,
+		text2 = "stamina_hud_bg.png",
+		item = settings.visual_max,
 		alignment = {x = -1, y = -1},
 		offset = {x = -266, y = -110},
 		max = 0,
 	})
+	set_hud_id(player, id)
 	stamina.set_saturation(player, level)
-	player:set_attribute(attribute.hud_id, id)
 	-- reset poisoned
 	stamina.set_poisoned(player, false)
+	-- remove legacy hud_id from player metadata
+	set_player_attribute(player, "stamina:hud_id", nil)
+end)
+
+minetest.register_on_leaveplayer(function(player)
+	set_hud_id(player, nil)
 end)
 
 minetest.register_globalstep(stamina_globaltimer)
