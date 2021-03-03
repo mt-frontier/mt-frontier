@@ -243,9 +243,12 @@ minetest.override_item("bucket:bucket_empty", {
 		if minetest.get_node(pointed_thing.under).name ~= "frontier_trees:maple_tree" then
 			return
 		end
-		local nn = "frontier_trees:syrup_bucket_empty"
 		local pos = pointed_thing.above
-		minetest.set_node(pos, {name=nn})	
+		local check_node = minetest.get_node(pos)
+		if check_node.name ~= "air" then
+			return
+		end
+		minetest.place_node(pos, {name="frontier_trees:syrup_bucket_empty"})	
 		itemstack:take_item(1)
 		return itemstack
 	end
