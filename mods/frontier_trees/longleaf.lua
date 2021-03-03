@@ -207,7 +207,7 @@ minetest.register_node("frontier_trees:longleaf_pine_tree_sapling", {
 	walkable = false,
 	on_timer = function(pos, elapsed)
 		if not default.can_grow(pos) then
-			return minetest:get_node_timer(pos):start(120)
+			return minetest:get_node_timer(pos):start(300)
 		end
 		pos.y = pos.y - 1
 		minetest.place_schematic(pos, longleaf_pine_tree_schematic, "random", nil, false, "place_center_x, place_center_z")
@@ -221,7 +221,7 @@ minetest.register_node("frontier_trees:longleaf_pine_tree_sapling", {
 	sounds = default.node_sound_leaves_defaults(),
 
 	on_construct = function(pos)
-		minetest.get_node_timer(pos):start(math.random(300, 1500))
+		minetest.get_node_timer(pos):start(math.random(300, 500))
 	end,
 })
 

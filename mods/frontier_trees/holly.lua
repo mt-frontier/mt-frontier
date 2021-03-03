@@ -110,11 +110,11 @@ minetest.register_node("frontier_trees:holly_sapling", {
 	paramtype = "light",
 	groups = {sapling = 1, flammable = 1, snappy = 3, oddly_breakable_by_hand = 1},
 	on_construct = function(pos)
-		minetest.get_node_timer(pos):set(math.random(300, 1500), 0)
+		minetest.get_node_timer(pos):set(math.random(300, 500), 0)
 	end,
 	on_timer = function(pos, elapsed)
 		if not default.can_grow(pos) then
-			return minetest:get_node_timer(pos):start(120)
+			return minetest:get_node_timer(pos):start(300)
 		end
 		minetest.place_schematic(pos, holly_bush_schematic, "random", nil, nil, "place_center_x, place_center_z")
 	end,

@@ -21,7 +21,7 @@ minetest.register_node("frontier_trees:poplar_leaves", {
 	special_tiles = {"frontier_trees_poplar_leaves.png"},
 	paramtype = "light",
 	is_ground_content = false,
-	groups = {snappy = 3, eeafdecay = 3, flammable = 2, leaves = 1},
+	groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1},
 	drop = {
 		max_items = 1,
 		items = {
@@ -182,7 +182,7 @@ minetest.register_node("frontier_trees:poplar_sapling", {
 	walkable = false,
 	on_timer = function(pos, elapsed)
 		if not default.can_grow(pos) then
-			return minetest:get_node_timer(pos):start(120)
+			return minetest:get_node_timer(pos):start(300)
 		end
 		pos.y = pos.y - 1
 		minetest.place_schematic(pos, poplar_tree_schematic, "random", nil, false, "place_center_x, place_center_z")
@@ -196,7 +196,7 @@ minetest.register_node("frontier_trees:poplar_sapling", {
 	sounds = default.node_sound_leaves_defaults(),
 
 	on_construct = function(pos)
-		minetest.get_node_timer(pos):start(math.random(300, 1500))
+		minetest.get_node_timer(pos):start(math.random(300, 500))
 	end,
 })
 
