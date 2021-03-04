@@ -183,7 +183,7 @@ local apple_tree_log_schematic = {
 
 minetest.register_decoration({
 	deco_type = "schematic",
-	place_on = {"default:dirt_with_grass"},
+	place_on = {"group:soil"},
 	sidelen = 8,
 	fill_ratio = 0.0003,
 	y_min = 1,
@@ -197,7 +197,7 @@ minetest.register_decoration({
 
 minetest.register_decoration({
 	deco_type = "schematic",
-	place_on = "default:dirt_with_grass",
+	place_on = "group:soil",
 	sidelen = 8,
 	fill_ratio = 0.001,
 	biomes = {"deciduous_forest"},
