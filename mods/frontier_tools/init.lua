@@ -224,8 +224,8 @@ farming.register_hoe("frontier_tools:steel_hoe", {
 
 --
 -- Misc
---[[
-minetest.register_tool("default:key", {
+-- from minetest_game
+minetest.register_tool("frontier_tools:key", {
 	description = "Key",
 	inventory_image = "default_key.png",
 	groups = {key = 1, not_in_creative_inventory = 1},
@@ -264,4 +264,6 @@ minetest.register_tool("default:key", {
 		return nil
 	end
 })
-]]--
+
+
+dofile(minetest.get_modpath("frontier_tools") .. "/crafts.lua")
