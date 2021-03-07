@@ -1,0 +1,3 @@
+[submodule "simple_protection"]
+	path = simple_protection
+	url = https://github.com/SmallJoker/simple_protection
