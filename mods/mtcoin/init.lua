@@ -321,3 +321,26 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 	
 end)
+
+-- API
+
+function mtcoin.can_afford(player_name, cost)
+	local cost_stack = ItemStack(cost)
+	local player = minetest.get_player_by_name(player_name)
+	local inv = player:get_inventory()
+	if inv:contains_item("purse", cost_stack) then
+		return true
+	end
+	return false
+end
+
+function mtcoin.take_coins(player_name, coins)
+	if mtcoin.can_afford(player_name, coins) == false then
+		return
+	end
+
+	local coin_stack = ItemStack(coins)
+	local player = minetest.get_player_by_name(player_name)
+	local inv = player:get_inventory()
+	inv:remove_item("purse", coin_stack)
+end

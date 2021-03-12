@@ -106,7 +106,7 @@ minetest.register_node("adv_craft:anvil", {
 	end,
 })
 
-function adv_craft.anvil.register_toolset(material)
+function adv_craft.anvil.register_toolset_craft(material)
 	local craft_material = "default:"..material.."_ingot"
 	local tools = {
 		--{toolname, number of craft material required}
@@ -124,9 +124,9 @@ function adv_craft.anvil.register_toolset(material)
 	end
 end
 
-adv_craft.anvil.register_toolset("tin")
+--adv_craft.anvil.register_toolset("tin")
 --adv_craft.anvil.register_toolset("bronze")
-adv_craft.anvil.register_toolset("steel")
+--adv_craft.anvil.register_toolset("steel")
 
 --adv_craft.anvil.register_craft("default:pick_steel", {"default:steel_ingot 3", "default:stick"})
 
