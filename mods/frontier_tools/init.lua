@@ -1,3 +1,4 @@
+frontier_tools = {}
 
 minetest.register_item(":", {
 	type = "none",

@@ -1,22 +1,22 @@
-adv_craft.mill = {}
-adv_craft.mill.recipes = {}
+craft.mill = {}
+craft.mill.recipes = {}
 
-minetest.register_craftitem("adv_craft:mill_wheel", {
+minetest.register_craftitem("craft:mill_wheel", {
 	description = "Stone Mill Wheel",
-	inventory_image = "adv_craft_mill_wheel.png",
-	wield_iamge = "adv_craft_mill_wheel.png"
+	inventory_image = "craft_mill_wheel.png",
+	wield_iamge = "craft_mill_wheel.png"
 })
 
-function adv_craft.register_mill_recipe(input, output)
+function craft.register_mill_recipe(input, output)
 	local input_stack = ItemStack(input)
 	local output_stack = ItemStack(output)
-	adv_craft.mill.recipes[input_stack:get_name()] = {
+	craft.mill.recipes[input_stack:get_name()] = {
 		input = input_stack,
 		output = output_stack,
 	}
 end
 
-function adv_craft.predict_mill_craft(pos)
+function craft.predict_mill_craft(pos)
 	local meta = minetest.get_meta(pos)
 	local inv = meta:get_inventory()
 	local stack = inv:get_stack("src", 1)
@@ -24,7 +24,7 @@ function adv_craft.predict_mill_craft(pos)
 		inv:set_stack("out", 1, ItemStack(""))
 		return
 	end
-	local craft = adv_craft.mill.recipes[stack:get_name()]
+	local craft = craft.mill.recipes[stack:get_name()]
 	if craft == nil then
 		return
 	end
@@ -35,10 +35,10 @@ function adv_craft.predict_mill_craft(pos)
 
 end
 
-minetest.register_node("adv_craft:mill", {
+minetest.register_node("craft:mill", {
 	description = "Stone Mill",
 	drawtype = "nodebox",
-	tiles = {"adv_craft_mill_top.png", "adv_craft_mill_top.png", "adv_craft_mill_side.png"},
+	tiles = {"craft_mill_top.png", "craft_mill_top.png", "craft_mill_side.png"},
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -75,7 +75,7 @@ minetest.register_node("adv_craft:mill", {
 		return 99
 	end,
 	on_metadata_inventory_put = function(pos, listname, index, stack, player)
-		adv_craft.predict_mill_craft(pos)
+		craft.predict_mill_craft(pos)
 	end,
 	on_metadata_inventory_take = function(pos, listname, index, stack, player)
 		if listname == "src" then
@@ -85,17 +85,17 @@ minetest.register_node("adv_craft:mill", {
 			print(output:get_name())
 			inv:remove_item("out", output)
 			--inv:set_stack("out", 1, nil)
-			adv_craft.predict_mill_craft(pos)
+			craft.predict_mill_craft(pos)
 		elseif listname == "out" then
 			local meta = minetest.get_meta(pos)
 			local inv = meta:get_inventory()
 			local input = inv:get_stack("src", 1)
-			local craft = adv_craft.mill.recipes[input:get_name()]
+			local craft = craft.mill.recipes[input:get_name()]
 			if craft and craft.output:get_name() == stack:get_name() then
 				inv:remove_item("src", craft.input)
 			end
 			if inv:is_empty(listname, index) then
-				adv_craft.predict_mill_craft(pos)
+				craft.predict_mill_craft(pos)
 			end
 		end
 	end,
@@ -103,7 +103,7 @@ minetest.register_node("adv_craft:mill", {
 })
 
 minetest.register_craft({
-	output = "adv_craft:mill_wheel",
+	output = "craft:mill_wheel",
 	recipe = {
 		{"", "default:stone", ""},
 		{"default:stone", "", "default:stone"},
@@ -112,13 +112,14 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = "adv_craft:mill",
+	output = "craft:mill",
 	recipe = {
-		{"adv_craft:mill_wheel"},
+		{"craft:mill_wheel"},
 		{"group:wood"},
-		{"adv_craft:mill_wheel"}
+		{"craft:mill_wheel"}
 	},
 })
-adv_craft.register_mill_recipe("farming:seed_wheat 4", "farming:flour")
-adv_craft.register_mill_recipe("frontier_trees:apple 1", "adv_craft:apple_sauce")
+
+craft.register_mill_recipe("farming:seed_wheat 4", "farming:flour")
+craft.register_mill_recipe("frontier_trees:apple 1", "adv_craft:apple_sauce")
 

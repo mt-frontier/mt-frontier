@@ -1,10 +1,10 @@
-minetest.register_node("adv_craft:candle", {
+minetest.register_node("craft:candle", {
 	description = "Candle",
 	drawtype = "plantlike",
-	inventory_image = "adv_craft_candle_inv.png",
-	wield_image = "adv_craft_candle_inv.png",
+	inventory_image = "craft_candle_inv.png",
+	wield_image = "craft_candle_inv.png",
 	tiles = {{
-		    name = "adv_craft_candle.png",
+		    name = "craft_candle.png",
 		    animation = {type = "vertical_frames", aspect_w = 16, aspect_h = 16, length = 3.3}
 	}},
 	walkable = false,
@@ -19,7 +19,7 @@ minetest.register_node("adv_craft:candle", {
 })
 
 minetest.register_craft({
-	output = "adv_craft:candle 3",
+	output = "craft:candle 3",
 	recipe = {
 		{"farming:string", "farming:string", "farming:string"},
 		{"mobs:beeswax", "mobs:beeswax", "mobs:beeswax"},
@@ -27,13 +27,13 @@ minetest.register_craft({
 	}
 })
 
-minetest.register_node("adv_craft:lantern", {
+minetest.register_node("craft:lantern", {
 	description = "Lantern",
 	drawtype = "plantlike",
-	inventory_image = "adv_craft_lantern_inv.png",
-	wield_image = "adv_craft_lantern_inv.png",
+	inventory_image = "craft_lantern_inv.png",
+	wield_image = "craft_lantern_inv.png",
 	tiles = {{
-		    name = "adv_craft_lantern.png",
+		    name = "craft_lantern.png",
 		    animation = {type = "vertical_frames", aspect_w = 16, aspect_h = 16, length = 3.3}
 	}},
 	walkable = false,
@@ -49,9 +49,9 @@ minetest.register_node("adv_craft:lantern", {
 })
 
 minetest.register_craft({
-	output = "adv_craft:lantern",
+	output = "craft:lantern",
 	recipe = {
 		{"vessels:glass_jar"},
-		{"adv_craft:candle"}
+		{"craft:candle"}
 	}
 })
