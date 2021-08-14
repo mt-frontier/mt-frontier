@@ -92,13 +92,16 @@ stamina.register_on_exhaust_player(function(player, change, cause)
     if player == nil then
         return
     end
-    
-    local temp = temperature.get_adjusted_temp(player:get_pos())
+    local pos = player:get_pos()
+    if pos == nil then
+        return
+    end
+    local temp = temperature.get_adjusted_temp(pos)
     local ambient_exhaustion_factor = 0
     if temp > hypothermic_temp and temp < heat_stroke_temp then
         return false
     end
-    -- Increase exhaustion by factor of temperture extremes
+    -- Increase exhaustion by factor of temperature extremes
     if temp <= hypothermic_temp then
         ambient_exhaustion_factor = get_factor(temp, hypothermic_temp)
     else
