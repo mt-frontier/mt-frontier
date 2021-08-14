@@ -1,27 +1,36 @@
+temperature = {}
+temperature.registered_on_temp_tick = {}
 local huds = {}
 local temp_tick = 5
 local freezing_temp = 40
 local overheating_temp = 80
 local base_exhaust_level = 5
 
-local function get_temp(player)
-	local pos = player:get_pos()
+function temperature.get_temp_tick()
+	return temp_tick
+end
+
+function temperature.get_adjusted_temp(pos)
 	local biome_data = minetest.get_biome_data(pos)
 	local temp = biome_data.heat
 	
-	--adjust for environmental factors
+	--adjust for environmental factors -- time of day, light level, elevation above/below sea level
 	local timeofday = minetest.get_timeofday()
+	local elevation_diff = math.abs(math.floor(pos.y/4))
 	local above = pos
 	above.y = above.y + 1
-	local ll = minetest.get_node_light(above) or 0
-	if timeofday < 0.25 then
-		temp = temp - 10
-	elseif timeofday > 0.5 and timeofday < 0.7 then
+	-- Elevation
+	temp = temp - elevation_diff
+	-- Time of day
+	if timeofday < 0.25 then -- Early morning
+		temp = temp - 8
+	elseif timeofday > 0.5 and timeofday < 0.7 then -- Afternoon
 		temp = temp + 5
 	end
-	
-	temp = temp + ll
-
+	-- Light level
+	local light_level = minetest.get_node_light(above) or 0
+	temp = temp + light_level
+	-- special nodes in proximity impacting temperature
 	local heat_nodes = minetest.find_nodes_in_area(
 		vector.subtract(pos, 2), 
 		vector.add(pos, 2), 
@@ -47,21 +56,9 @@ local function get_temp(player)
 	return temp
 end
 
-local function get_exhaustion_level(temp)
-	local exhaust_level = base_exhaust_level
-	local diff = 0
-	if temp <= freezing_temp then
-		diff = math.ceil((freezing_temp - temp)/10)
-	elseif temp >= overheating_temp then
-		diff = math.ceil((overheating_temp - temp)/10)
-	else
-		exhaust_level = 0
-	end
-	return exhaust_level
-end
-
 function get_hud_defs(player)
-	local temp = get_temp(player)
+	local pos = player:get_pos()
+	local temp = temperature.get_adjusted_temp(pos)
 	local far = math.floor(temp)
 	local cel = math.floor((far - 32) * (5/9))
 	local percent = 0
@@ -122,18 +119,21 @@ end)
 
 local temp_timer = 0
 
+function temperature.register_on_temp_tick(func)
+	table.insert(temperature.registered_on_temp_tick, func)
+end
+
 minetest.register_globalstep(function(dt)
 	temp_timer = temp_timer + dt
 	if temp_timer >= temp_tick then
 		for i, player in ipairs(minetest.get_connected_players()) do
-			local name = player:get_player_name()
-			local temp = get_temp(player)
-			huds_update(player)	
-			if minetest.get_modpath("stamina") then
-				local exhaust_level = get_exhaustion_level(temp)
-				stamina.exhaust_player(player, exhaust_level, "temperature")
-			end
-		end	
+			local pos = player:get_pos()
+			local temp = temperature.get_adjusted_temp(pos)
+			huds_update(player)
+			for _, func in ipairs(temperature.registered_on_temp_tick) do
+				func(player)
+			end	
+		end
 		temp_timer = 0
 	end
 end)

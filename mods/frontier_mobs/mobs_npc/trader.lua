@@ -390,10 +390,10 @@ function mobs_trader(self, clicker, entity, class)
 
 			if i < 6 then
 				x = 0.5
-				y = i - 0.5
+				y = i
 			else
 				x = 4.5
-				y = i - 5.5
+				y = i - 5
 			end
 
 			formspec_trade_list = formspec_trade_list
@@ -406,9 +406,11 @@ function mobs_trader(self, clicker, entity, class)
 	end
 
 	minetest.show_formspec(player, "mobs_npc:trade", "size[8,10]"
+		.. "label[4,0;Funds:]"
+		.. "list[current_player;purse;5.5,0;2,1;]"
 		.. default.gui_bg_img
 		.. default.gui_slots
-		.. "label[0.5,-0.1;" .. S("Trader @1's stock:", self.game_name) .. "]"
+		.. "label[0.5,0.25;" .. S("Trader @1's Stock", self.game_name) .. "]"
 		.. formspec_trade_list
 		.. "list[current_player;main;0,6;8,4;]"
 	)
@@ -451,24 +453,23 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				local goods = self.trades[trade_number][1]
 				local inv = player:get_inventory()
 				local leftover
-				if inv:contains_item("purse", price) then
 
-					inv:remove_item("purse", price)
+				if inv:contains_item("purse", price) then
+					mtcoin.take_coins(player, price)
+					--inv:remove_item("purse", price)
 
 					leftover = inv:add_item("main", goods)
 				
 				elseif inv:contains_item("main", price) then
 					inv:remove_item("main", price)
 					if minetest.get_item_group(ItemStack(goods):get_name(), "coin") == 1 then
-						inv:add_item("purse", goods)
-						--local class = classes.get_class(player)
-						--if class == "trader" then
-						--	classes.change_xp(player, mtcoin.coin_to_xp(ItemStack(goods)))
-						--end
+						--inv:add_item("purse", goods)
+						mtcoin.give_coins(player, goods)
 					else
 						leftover = inv:add_item("main", goods)
 
 					end
+				else minetest.chat_send_player(player:get_player_name(), "You do not have the items to make this trade.")
 				end
 				if leftover == nil then
 					return

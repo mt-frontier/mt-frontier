@@ -18,7 +18,7 @@ minetest.register_node("frontier_plants:prickly_pear_fruiting", {
 	},
 	on_punch = function(pos, node, puncher)
 		local wield_name = puncher:get_wielded_item():get_name()
-		if wield_name == "" then
+		if minetest.registered_tools[wield_name] == nil then
 			puncher:punch(puncher, 1, {
 				full_punch_interval = 1,
 				damage_groups = {fleshy = 1},

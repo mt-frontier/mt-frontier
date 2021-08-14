@@ -6,6 +6,7 @@ local cabin_loot = {
 	{"bows:arrow", 36, 9},
 	{"default:pick_steel", 1, 10},
 	{"default:pick_bronze", 1, 8},
+	{"default:dagger_stone", 1, 9},
 	{"frontier_trees:apple", 9, 7},
 	{"farming:bread", 1, 8},
 	{"farming:seed_wheat", 9, 6},
@@ -17,13 +18,15 @@ local cabin_loot = {
 	{"crops:pumpkin_seed", 9, 8},
 	{"crops:melon_seed", 9, 8},
 	{"craftguide:book", 1, 10},
-	{"frontier_guns:shotgun_shell", 3, 48},
+	
+	{"frontier_guns:shotgun", 1, 24},
+	{"frontier_guns:shotgun_shell", 3, 18},
 }
 
 cabin_loot = buildings.sort_loot(cabin_loot)
 
 minetest.register_node("buildings:cabin_seed", {
-	description = "Placeholder for checking coditions for Cabin spawning",
+	description = "Placeholder for checking conditions for Cabin spawning",
 	drawtype = "airlike",
 	groups = {not_in_creative_inventory = 1},
 })
@@ -63,3 +66,9 @@ minetest.register_lbm({
 	end,
 })
 
+minetest.register_craftitem("buildings:cabin_plan", {
+	inventory_image = "buildings_cabin_plan.png",
+	on_place = function(itemstack, placer, pointed_thing)
+		print(pointed_thing.type)
+	end,
+})

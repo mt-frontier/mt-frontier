@@ -249,42 +249,7 @@ function ts_furniture.register_furniture(recipe, description, texture)
 			def.on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 				local name = clicker:get_player_name()
 				local meta = minetest.get_meta(pos)
-				local owner = meta:get_string("owner")
 				local state = minetest.get_node(pos)
-				if owner == "" then
-					owner = name
-					meta:set_string("owner", owner)
-					meta:set_string("infotext", "Owned by ".. owner)
-					local player_meta = clicker:get_meta()
-					--local storage = player_meta:get_string("storage")
-					--if storage == "" then
-					--	storage = {}
-					--else
-					--	storage = minetest.deserialize(storage)
-					--end
-					--table.insert(storage, pos)
-					--player_meta:set_string("storage", minetest.serialize(storage))
-				end
-				if name ~= owner and string.match(state.name, "_closed") then
-					local wield = clicker:get_wielded_item():get_name()
-					if wield == "adv_craft:lockpick"  then
-						local prob = 10
-						local class = clicker:get_meta():get_string("class")
-						local xp = classes:get_xp(name)
-						local owner_xp = classes:get_xp(owner)
-						if class ~= "gunslinger" or xp < 30000 then
-							if owner_xp > prob then
-								prob = owner_xp
-							end
-							local rand = math.random(1, prob)
-							if rand ~= 1 then
-								return minetest.chat_send_player(name, "The " .. def.description:lower() .." is locked.")
-							end
-						end
-					else
-								return minetest.chat_send_player(name, "The " .. def.description:lower() .." is locked.")
-					end
-				end
 				local formspec = 
 					"size[".. tostring(4+rows) .. ",9]" ..
 					"list[nodemeta:"..pos.x..","..pos.y..","..pos.z .. ";main;0,0;8,".. tostring(rows) ..";]"..
@@ -293,10 +258,10 @@ function ts_furniture.register_furniture(recipe, description, texture)
 				if state.name == node_name:gsub("_open","_closed") then
 					minetest.swap_node(pos, {name = node_name:gsub("_closed", "_open"), param2 = state.param2})
 					minetest.show_formspec(name, "furniture_"..minetest.pos_to_string(pos), formspec)
-				elseif owner == name then
-					minetest.swap_node(pos, {name = node_name, param2 = state.param2})
 				else
-					minetest.show_formspec(name, "furniture_"..minetest.pos_to_string(pos), formspec)
+					minetest.swap_node(pos, {name = node_name:gsub("_open", "_closed"), param2 = state.param2})
+
+					--minetest.show_formspec(name, "furniture_"..minetest.pos_to_string(pos), formspec)
 				end
 			end
 		end
@@ -334,7 +299,7 @@ function ts_furniture.register_furniture(recipe, description, texture)
 			--	minetest.swap_node(pos, {name = nn1})
 		--	end
 			--node_def.on_construct = nil
-			node_def2.drop = {nn1}
+			node_def2.drop = {node_name}
 			for k, v in pairs(node_def) do
 				if node_def2[k] == nil then
 					node_def2[k] = v

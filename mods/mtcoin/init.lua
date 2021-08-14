@@ -15,6 +15,114 @@ end
 local gold_img = minetest.registered_items["mtcoin:gold"].inventory_image
 local copper_img = minetest.registered_items["mtcoin:copper"].inventory_image
 
+mtcoin.new_game_coins = "mtcoin:gold 20"
+
+
+local shop_items_pricelist = {
+    {"default:pick_steel", "mtcoin:gold 12"},
+    {"default:axe_steel", "mtcoin:gold 12"},
+    {"farming:hoe_steel", "mtcoin:gold 9"},
+	{"crops:watering_can", "mtcoin:gold 7"},
+    {"default:torch 9", "mtcoin:gold 3"},
+	{"farming:bread", "mtcoin:gold 2"},
+    {"frontier_trees:apple 9", "mtcoin:gold 3"},
+    {"default:dagger_steel", "mtcoin:gold 9"},
+    {"affliction:bandage", "mtcoin:gold 5"},
+	{"affliction:waterskin", "mtcoin:gold 8"},
+	{"bows:bow_wood", "mtcoin:gold 15"},
+	{"bows:arrow 3", "mtcoin:gold 3"},
+    {"frontier_guns:revolver 1", "mtcoin:gold 496"},
+    {"frontier_guns:bullet 1", "mtcoin:gold 18"},
+	{"boats:boat", "mtcoin:gold 20"},
+	{"fire:flint_and_steel", "mtcoin:gold 5"},
+}
+
+minetest.register_node("mtcoin:new_game_shop", {
+    description = "New Game Shop.",
+    tiles = {"mtcoin_crate.png^mtcoin_inv.png"},
+	light_source = 10,
+	is_ground_content = false,
+	on_receive_fields = function(pos, formname, fields, sender)
+		local sender_name = sender:get_player_name()
+		local meta = minetest.get_meta(pos)
+		local owner = meta:get_string("owner")
+		if owner ~= sender_name then
+			return
+		end
+		for k, v in pairs(fields) do
+			if shop_items_pricelist[tonumber(k)] ~= nil then
+				local price_table = shop_items_pricelist[tonumber(k)]
+				local itemstring = price_table[1]
+				local price = price_table[2]
+				if mtcoin.can_afford(sender, price) then
+					mtcoin.take_coins(sender, price)
+					mtcoin.give_item(sender, itemstring)
+				end
+			end
+			
+		end
+		
+	end,
+    on_construct = function(pos)
+        local timer = minetest.get_node_timer(pos)
+        timer:start(600)
+    end,
+    on_timer = function(pos, elapsed)
+		print("removing shop", elapsed)
+        minetest.remove_node(pos)
+    end
+
+})
+
+local function get_shop_formspec(player)
+    local player_name = player:get_player_name()
+    local x, y
+	
+	local formspec = "size[8,9]" ..
+	"label[1.5,0.25;Your Funds]"..
+	"list[current_player;purse;3,0;2,1;]"
+
+	for i = 1, 16 do
+		if shop_items_pricelist[i] == nil then
+			return formspec
+		end 
+		local sale_item = shop_items_pricelist[i]
+
+		if i < 9 then
+			x = 0.5
+			y = i
+		else
+			x = 4.5
+			y = i - 8
+		end
+
+		formspec = formspec
+		.. "item_image_button[".. x ..",".. y ..";1,1;"
+			.. sale_item[2] .. ";prices#".. i ..";]"
+		.. "item_image_button[".. x + 2 ..",".. y ..";1,1;"
+			.. sale_item[1] .. ";" .. i .. ";]"
+		.. "image[".. x + 1 ..",".. y ..";1,1;gui_arrow_blank.png]"
+
+	end
+
+    return formspec
+end
+
+local function place_new_game_shop(player)
+	local pos = player:get_pos()
+	local pos1 = vector.subtract(pos, 8)
+	local pos2 = vector.add(pos, 8)
+	local places_for_shop = minetest.find_nodes_in_area_under_air(pos1, pos2, {"group:cracky", "group:crumbly", "group:choppy"})
+	local place_shop = places_for_shop[math.random(#places_for_shop)]
+	place_shop.y = place_shop.y + 1
+	minetest.place_node(place_shop, {name = "mtcoin:new_game_shop"})
+	-- Set up shop for player
+	local node_meta = minetest.get_meta(place_shop)
+	node_meta:set_string("owner", player:get_player_name())
+	node_meta:set_string("formspec", get_shop_formspec(player))
+end
+
+
 local function create_purse(player)
 	local inv = minetest.get_inventory({type = "player", name = player:get_player_name()})
 	inv:set_size("purse", 2)
@@ -24,22 +132,7 @@ local function create_purse(player)
 	inv:set_size("price_list", 8)
 end
 
-minetest.register_on_newplayer(function(player)
-	create_purse(player)
-end)
-
-function mtcoin.coin_to_xp(coin_stack)
-	local stack = coin_stack
-	local xp = 0
-	if stack:get_name() == "mtcoin:gold" then
-		xp = 3 * stack:get_count()
-	elseif stack:get_name() == "mtcoin:copper" then
-		xp = stack:get_count()
-	end
-	return xp
-end
-
-local function refresh_trade_inventory(player,buyer)
+local function refresh_trade_inventory(player, buyer)
 	local meta = player:get_meta()
 	local trade_list = minetest.deserialize(meta:get_string("trade_list"))
 	local inv = minetest.create_detached_inventory("temp",nil, player:get_player_name())
@@ -66,15 +159,45 @@ local function refresh_trade_inventory(player,buyer)
 	minetest.remove_detached_inventory("temp")
 end
 
+minetest.register_on_dieplayer(function(player)
+	local meta = player:get_meta()
+	meta:set_int("just_died", 1)
+end)
+
 minetest.register_on_respawnplayer(function(player)
 	local meta = player:get_meta()
-	meta:set_string("trade_list", "")
+	local just_died = meta:get_int("just_died") or 0
+	if just_died == 0 then
+		return
+	end
+	meta:set_int("just_died", 0)
+    local pos = player:get_pos()
+	minetest.after(2, function()
+		place_new_game_shop(player)
+	end)
+end)
+
+minetest.register_on_newplayer(function(player)
+	create_purse(player)
+	mtcoin.give_coins(player, mtcoin.new_game_coins)
+	place_new_game_shop(player)
+end)
+
+minetest.register_on_dieplayer(function(player)
+	local player_name = player:get_player_name()
+	if mtcoin.can_afford(player, mtcoin.new_game_coins) then
+		return
+	end
+	mtcoin.empty_coins(player)
+	mtcoin.give_coins(player, mtcoin.new_game_coins)
 end)
 
 minetest.register_allow_player_inventory_action(function(player, action, inventory, inventory_info)
 	local info = inventory_info
+	local stack_count
 	if info.stack then
 		local stackname = info.stack:get_name()
+		stack_count = info.stack:get_count()
 		if action == "take" then
 			if info.listname == "for_trade" then
 				return 0
@@ -104,7 +227,7 @@ minetest.register_allow_player_inventory_action(function(player, action, invento
 				if from_stack:get_name() ~= to_stack:get_name() and not to_stack:is_empty() and not info.count == from_stack:get_count() then
 					return 0
 				else
-					return 99 
+					return stack_count
 				end
 			elseif info.to_list ~= "to_trade" then
 				return 0
@@ -268,6 +391,7 @@ minetest.register_chatcommand("trade", {
 })
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
+	print(formname, fields)
 	if not minetest.player_exists(formname) then
 		return
 	end
@@ -310,23 +434,14 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			trader_meta:set_string("trade_list", minetest.serialize(trade_list))
 			refresh_trade_inventory(trader, player)
 			minetest.chat_send_player(trader:get_player_name(), player:get_player_name() .. " bought ".. stack:get_name() .. " from you.")
-			--if trader:get_player_name() ~= player:get_player_name() then
-			--	local class = classes.get_class(trader)
-			--	if class ~= "trader" then
-			--		return
-			--	end
-			--	classes.change_xp(trader, mtcoin.coin_to_xp(price))
-			--end
-		end	
+		end
 	end
-	
 end)
 
 -- API
 
-function mtcoin.can_afford(player_name, cost)
+function mtcoin.can_afford(player, cost)
 	local cost_stack = ItemStack(cost)
-	local player = minetest.get_player_by_name(player_name)
 	local inv = player:get_inventory()
 	if inv:contains_item("purse", cost_stack) then
 		return true
@@ -334,13 +449,32 @@ function mtcoin.can_afford(player_name, cost)
 	return false
 end
 
-function mtcoin.take_coins(player_name, coins)
-	if mtcoin.can_afford(player_name, coins) == false then
+function mtcoin.take_coins(player, coins)
+	if mtcoin.can_afford(player, coins) == false then
 		return
 	end
 
 	local coin_stack = ItemStack(coins)
-	local player = minetest.get_player_by_name(player_name)
 	local inv = player:get_inventory()
 	inv:remove_item("purse", coin_stack)
+end
+
+function mtcoin.give_coins(player, coins)
+	local coin_stack = ItemStack(coins)
+	local inv = player:get_inventory()
+	inv:add_item("purse", coin_stack)
+end
+
+function mtcoin.give_item(player, itemstring)
+	local itemstack = ItemStack(itemstring)
+	local inv = player:get_inventory()
+	inv:add_item("main", itemstack)
+end
+
+function mtcoin.empty_coins(player)
+	local inv = player:get_inventory()
+	for i = 1,2 do
+		local stack = inv:get_stack("purse", i)
+		inv:remove_item("purse", stack)
+	end
 end

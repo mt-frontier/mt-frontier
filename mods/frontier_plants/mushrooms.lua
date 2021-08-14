@@ -2,6 +2,12 @@
 -- Mushrooms
 --
 
+minetest.register_craftitem("frontier_plants:ganoderma", {
+	description = "Ganoderma Mushroom",
+	inventory_image = "frontier_plants_ganoderma.png",
+	groups = {mushroom=1}
+})
+
 minetest.register_node("frontier_plants:amanita", {
 	description = "Innocent-looking Brown Mushroom",
 	tiles = {"frontier_plants_amanita.png"},
@@ -12,7 +18,7 @@ minetest.register_node("frontier_plants:amanita", {
 	sunlight_propagates = true,
 	walkable = false,
 	buildable_to = true,
-	groups = {mushroom = 1, snappy = 3, attached_node = 1, flammable = 1},
+	groups = {poison=1, mushroom = 1, snappy = 3, attached_node = 1, flammable = 1},
 	sounds = default.node_sound_leaves_defaults(),
 	on_use = minetest.item_eat(-14),
 	selection_box = {
