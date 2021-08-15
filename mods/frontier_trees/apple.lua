@@ -58,10 +58,10 @@ minetest.register_node("frontier_trees:apple", {
 	groups = {fleshy = 3, dig_immediate = 3, flammable = 2, leafdecay = 3, leafdecay_drop = 1, food_apple = 1},
 	on_use = minetest.item_eat(2),
 	after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		local above = pos
+		local above = table.copy(pos)
 		above.y = above.y + 1
 		if minetest.get_node(above).name == "frontier_trees:apple_leaves" then
-			minetest.place_node(pos, {name = "frontier_trees:apple_blossom"})
+			minetest.set_node(pos, {name = "frontier_trees:apple_blossom"})
 		end
 	end,
 	sounds = default.node_sound_leaves_defaults(),
@@ -72,7 +72,7 @@ minetest.register_node("frontier_trees:apple_blossom", {
 	drawtype = "plantlike",
 	tiles = {"frontier_trees_apple_blossom.png"},
 	inventory_image = "frontier_trees_apple_blossom.png",
-	prarmtype = "light",
+	paramtype = "light",
 	sunlight_propogates = true,
 	walkable = false,
 	buildable_to = true,
@@ -83,7 +83,7 @@ minetest.register_node("frontier_trees:apple_blossom", {
 	},
 	groups = {snappy = 3, flammable = 2, leafdecay = 3, dig_immediate = 2},
 	sounds = default.node_sound_leaves_defaults(),
-	after_place_node = function(pos, oldnode, oldmeta, drops)
+	on_construct = function(pos)
 		local timeout = math.random(600, 1200)
 		minetest.get_node_timer(pos):set(timeout, 0)
 	end,
@@ -112,7 +112,7 @@ frontier_stairs.register_stairs("apple_wood", "Apple Wood", {"frontier_trees_app
 
 default.register_leafdecay({
 	trunks = {"frontier_trees:apple_tree"},
-	leaves = {"frontier_trees:apple_leaves", "frontier_trees:apple"},
+	leaves = {"frontier_trees:apple_leaves", "frontier_trees:apple", "frontier_trees:apple_blossom"},
 	radius = 2,
 })
 -- Generate Schematic

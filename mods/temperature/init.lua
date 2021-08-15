@@ -11,6 +11,9 @@ function temperature.get_temp_tick()
 end
 
 function temperature.get_adjusted_temp(pos)
+	if pos == nil then
+		return
+	end
 	local biome_data = minetest.get_biome_data(pos)
 	local temp = biome_data.heat
 	

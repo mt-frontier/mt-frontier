@@ -14,9 +14,8 @@ minetest.register_node("frontier_trees:longleaf_pine_tree", {
 	sounds = default.node_sound_wood_defaults(),
 	on_place = minetest.rotate_node,
 	after_dig_node = function(pos, oldnode, oldmetadata, digger)
-		local dir = {x = 2, y = 2, z = 2}
-		local pos1 = vector.subtract(pos, dir)
-		local pos2 = vector.add(pos, dir)
+		local pos1 = vector.subtract(pos, 2)
+		local pos2 = vector.add(pos, 2)
 		local cones = minetest.find_nodes_in_area(pos1, pos2, {"frontier_trees:pine_cone"})
 		for _, pos in ipairs(cones) do
 			minetest.dig_node(pos)
@@ -57,9 +56,11 @@ minetest.register_node("frontier_trees:pine_cone", {
 	tiles = {"frontier_trees_pine_cone.png"},
 	inventory_image = "frontier_trees_pine_cone.png",
 	paramtype = "light",
-	paramtype2 = "meshoptions",
+	sunlight_propagates = true,
+	--paramtype2 = "meshoptions",
+	--buildable_to = "true",
 	walkable = false,
-	groups = {snappy = 3, dig_immediate = 2, flammable = 1},
+	groups = {snappy = 3, flammable = 1, leafdecay = 3, leafdecay_drop = 1},
 	drop = {
 		max_items = 2,
 		items = {
@@ -68,9 +69,11 @@ minetest.register_node("frontier_trees:pine_cone", {
 		}
 	},
 	after_place_node = function(pos)
-		minetest.set_node(pos, {name = "frontier_trees:pine_cone", param2 = 2})
+		--minetest.set_node(pos, {name = "frontier_trees:pine_cone", param2 = 1})
 	end,
 })
+
+
 local tree_name = "longleaf_pine"
 local tree_def = minetest.registered_nodes["frontier_trees:longleaf_pine_tree"]
 local tree_tiles = {tree_def.tiles[1]}
@@ -87,7 +90,7 @@ stairs.register_stair_and_slab(
 
 default.register_leafdecay({
 	trunks = {"frontier_trees:longleaf_pine_tree"},
-	leaves = {"frontier_trees:longleaf_pine_needles"},
+	leaves = {"frontier_trees:pine_cone", "frontier_trees:longleaf_pine_needles", },
 	radius = 3,
 })
 -- Generate Schematic

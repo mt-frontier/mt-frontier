@@ -178,9 +178,10 @@ minetest.register_on_respawnplayer(function(player)
 end)
 
 minetest.register_on_newplayer(function(player)
+	local meta = player:get_meta()
+	meta:set_int("just_died", 1)
 	create_purse(player)
 	mtcoin.give_coins(player, mtcoin.new_game_coins)
-	place_new_game_shop(player)
 end)
 
 minetest.register_on_dieplayer(function(player)
