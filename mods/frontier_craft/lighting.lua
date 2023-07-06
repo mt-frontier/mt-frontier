@@ -1,4 +1,4 @@
-minetest.register_node("adv_craft:candle", {
+minetest.register_node("frontier_craft:candle", {
 	description = "Candle",
 	drawtype = "plantlike",
 	inventory_image = "adv_craft_candle_inv.png",
@@ -19,7 +19,7 @@ minetest.register_node("adv_craft:candle", {
 })
 
 minetest.register_craft({
-	output = "adv_craft:candle 3",
+	output = "frontier_craft:candle 3",
 	recipe = {
 		{"farming:string", "farming:string", "farming:string"},
 		{"mobs:beeswax", "mobs:beeswax", "mobs:beeswax"},
@@ -27,7 +27,7 @@ minetest.register_craft({
 	}
 })
 
-minetest.register_node("adv_craft:lantern", {
+minetest.register_node("frontier_craft:lantern", {
 	description = "Lantern",
 	drawtype = "plantlike",
 	inventory_image = "adv_craft_lantern_inv.png",
@@ -49,9 +49,9 @@ minetest.register_node("adv_craft:lantern", {
 })
 
 minetest.register_craft({
-	output = "adv_craft:lantern",
+	output = "frontier_craft:lantern",
 	recipe = {
 		{"vessels:glass_jar"},
-		{"adv_craft:candle"}
+		{"frontier_craft:candle"}
 	}
 })

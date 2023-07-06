@@ -1,12 +1,22 @@
-adv_craft = {}
-local mp = minetest.get_modpath("adv_craft")
+-- Manual crafting library
+frontier_craft = {}
+frontier_craft.skills = {}
+frontier_craft.craft_stations = {}
+frontier_craft.registered_crafts = {}
 
-dofile(mp .. "/materials.lua")
-dofile(mp .. "/mill.lua")
-dofile(mp .. "/lighting.lua")
-dofile(mp .. "/anvil.lua")
+local mp = minetest.get_modpath("frontier_craft")
 
-function adv_craft.player_has_item(player, itemstring)
+
+function frontier_craft.register_craft_station(station_name, num_inputs)
+end
+
+function frontier_craft.register_craft(station, output, inputs, craft_time, energy_src)
+	assert(energy_src == "fuel" or energy_src == "manual")
+
+
+end
+
+function frontier_craft.player_has_item(player, itemstring)
 	local stack = ItemStack(itemstring)
 	local inv = minetest.get_inventory({type = "player", name = player:get_player_name()})
 	if not inv:contains_item("main", stack) then
@@ -14,3 +24,12 @@ function adv_craft.player_has_item(player, itemstring)
 	end
 	return true
 end
+
+dofile(mp .. "/skill.lua")
+dofile(mp .. "/mortar.lua")
+--dofile(mp .. "/materials.lua")
+dofile(mp .. "/mill.lua")
+dofile(mp .. "/lighting.lua")
+dofile(mp .. "/anvil.lua")
+
+

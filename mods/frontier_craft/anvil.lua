@@ -1,5 +1,5 @@
-adv_craft.anvil = {}
-adv_craft.anvil.recipes = {}
+frontier_craft.anvil = {}
+frontier_craft.anvil.recipes = {}
 		local formspec = "size[8,9]" ..
 			"label[1.5,0;Available crafts based on player's skill and inventory]" ..
 			--"list[detached:anvil;in;3.5,1;1,1;]" ..
@@ -7,19 +7,19 @@ adv_craft.anvil.recipes = {}
 			"list[detached:anvil;out;1.5,1;5,3;]" ..
 			"list[current_player;main;0,5;8,4;]"
 
-function adv_craft.anvil.register_craft(output, inputs)
-	adv_craft.anvil.recipes[output] = inputs
+function frontier_craft.anvil.register_craft(output, inputs)
+	frontier_craft.anvil.recipes[output] = inputs
 end
 
 local function can_craft(player, inputs)
 	if type(inputs) == "table" then
 		for i, item in ipairs(inputs) do
-			if not adv_craft.player_has_item(player, item) then
+			if not frontier_craft.player_has_item(player, item) then
 				return false
 			end
 		end
 	elseif type(inputs) == "string" then
-		if not adv_craft:player_has_item(player, item) then
+		if not frontier_craft:player_has_item(player, item) then
 			return false
 		end
 	end
@@ -35,17 +35,17 @@ local function clear_anvil()
 	end
 end
 
-function adv_craft.anvil.predict_craft(pos, clicker)
+function frontier_craft.anvil.predict_craft(pos, clicker)
 	local anv_inv = minetest.get_inventory({type = "detached", name = "anvil"})
 	clear_anvil()
-	for k,v in pairs(adv_craft.anvil.recipes) do
+	for k,v in pairs(frontier_craft.anvil.recipes) do
 		if can_craft(clicker, v) then	
 			anv_inv:add_item("out", k)
 		end
 	end
 end
 
-minetest.register_node("adv_craft:anvil", {
+minetest.register_node("frontier_craft:anvil", {
 	description = "Anvil for crafting and repairing tools",
 	drawtype = "nodebox",
 	tiles = {"default_steel_block.png"},
@@ -84,7 +84,7 @@ minetest.register_node("adv_craft:anvil", {
 				on_take = function(inv, listname, index, stack, player)
 				--remove inputs from player inv and reload outputs	
 					local key = stack:get_name()
-					local inputs = adv_craft.anvil.recipes[key]
+					local inputs = frontier_craft.anvil.recipes[key]
 					local player_inv = minetest.get_inventory({type = "player", name = player:get_player_name()})
 					if type(inputs) == "table" then
 						for i, item in ipairs(inputs) do
@@ -93,7 +93,7 @@ minetest.register_node("adv_craft:anvil", {
 					elseif type(inputs) == "string" then
 						player_inv:remove_item("main", inputs)
 					end
-					adv_craft.anvil.predict_craft(pos, player)
+					frontier_craft.anvil.predict_craft(pos, player)
 					minetest.sound_play({name="anvil_clang"}, {pos=player:get_pos()})
 					minetest.close_formspec(player:get_player_name(), player:get_player_name()..":anvil", formspec)
 				end,
@@ -101,12 +101,12 @@ minetest.register_node("adv_craft:anvil", {
 			clicker:get_player_name()
 		)
 		anvil_inv:set_size("out", 15)
-		adv_craft.anvil.predict_craft(pos,clicker)
+		frontier_craft.anvil.predict_craft(pos,clicker)
 		minetest.show_formspec(clicker:get_player_name(), clicker:get_player_name()..":anvil", formspec)
 	end,
 })
 
-function adv_craft.anvil.register_toolset_craft(material)
+function frontier_craft.anvil.register_toolset_craft(material)
 	local craft_material = "default:"..material.."_ingot"
 	local tools = {
 		--{toolname, number of craft material required}
@@ -117,17 +117,17 @@ function adv_craft.anvil.register_toolset_craft(material)
 		{"frontier_tools:" .. material .. "_hoe", 2},
 	}
 	for n = 1, #tools do
-		adv_craft.anvil.register_craft(
+		frontier_craft.anvil.register_craft(
 			tools[n][1], 
 			{"default:stick", craft_material .. " " .. tools[n][2]}
 		)
 	end
 end
 
---adv_craft.anvil.register_toolset("tin")
---adv_craft.anvil.register_toolset("bronze")
---adv_craft.anvil.register_toolset("steel")
+--frontier_craft.anvil.register_toolset("tin")
+--frontier_craft.anvil.register_toolset("bronze")
+--frontier_craft.anvil.register_toolset("steel")
 
---adv_craft.anvil.register_craft("default:pick_steel", {"default:steel_ingot 3", "default:stick"})
+--frontier_craft.anvil.register_craft("default:pick_steel", {"default:steel_ingot 3", "default:stick"})
 
 
