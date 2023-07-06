@@ -1,22 +1,22 @@
-adv_craft.mill = {}
-adv_craft.mill.recipes = {}
+frontier_craft.mill = {}
+frontier_craft.mill.recipes = {}
 
-minetest.register_craftitem("adv_craft:mill_wheel", {
+minetest.register_craftitem("frontier_craft:mill_wheel", {
 	description = "Stone Mill Wheel",
-	inventory_image = "adv_craft_mill_wheel.png",
-	wield_iamge = "adv_craft_mill_wheel.png"
+	inventory_image = "frontier_craft_mill_wheel.png",
+	wield_iamge = "frontier_craft_mill_wheel.png"
 })
 
-function adv_craft.register_mill_recipe(input, output)
+function frontier_craft.register_mill_recipe(input, output)
 	local input_stack = ItemStack(input)
 	local output_stack = ItemStack(output)
-	adv_craft.mill.recipes[input_stack:get_name()] = {
+	frontier_craft.mill.recipes[input_stack:get_name()] = {
 		input = input_stack,
 		output = output_stack,
 	}
 end
 
-function adv_craft.predict_mill_craft(pos)
+function frontier_craft.predict_mill_craft(pos)
 	local meta = minetest.get_meta(pos)
 	local inv = meta:get_inventory()
 	local stack = inv:get_stack("src", 1)
@@ -24,7 +24,7 @@ function adv_craft.predict_mill_craft(pos)
 		inv:set_stack("out", 1, ItemStack(""))
 		return
 	end
-	local craft = adv_craft.mill.recipes[stack:get_name()]
+	local craft = frontier_craft.mill.recipes[stack:get_name()]
 	if craft == nil then
 		return
 	end
@@ -35,10 +35,10 @@ function adv_craft.predict_mill_craft(pos)
 
 end
 
-minetest.register_node("adv_craft:mill", {
+minetest.register_node("frontier_craft:mill", {
 	description = "Stone Mill",
 	drawtype = "nodebox",
-	tiles = {"adv_craft_mill_top.png", "adv_craft_mill_top.png", "adv_craft_mill_side.png"},
+	tiles = {"frontier_craft_mill_top.png", "frontier_craft_mill_top.png", "frontier_craft_mill_side.png"},
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -49,7 +49,7 @@ minetest.register_node("adv_craft:mill", {
 			{-3/8, -1/2, -1/2, 3/8, -1/16, 1/2}
 		},
 	},
-	groups = {cracky = 2, },
+	groups = {cracky=2, oddly_breakable_by_hand=2},
 	on_construct = function(pos)
 		local meta = minetest.get_meta(pos)
 		local inv = meta:get_inventory()
@@ -75,7 +75,7 @@ minetest.register_node("adv_craft:mill", {
 		return 99
 	end,
 	on_metadata_inventory_put = function(pos, listname, index, stack, player)
-		adv_craft.predict_mill_craft(pos)
+		frontier_craft.predict_mill_craft(pos)
 	end,
 	on_metadata_inventory_take = function(pos, listname, index, stack, player)
 		if listname == "src" then
@@ -85,17 +85,17 @@ minetest.register_node("adv_craft:mill", {
 			print(output:get_name())
 			inv:remove_item("out", output)
 			--inv:set_stack("out", 1, nil)
-			adv_craft.predict_mill_craft(pos)
+			frontier_craft.predict_mill_craft(pos)
 		elseif listname == "out" then
 			local meta = minetest.get_meta(pos)
 			local inv = meta:get_inventory()
 			local input = inv:get_stack("src", 1)
-			local craft = adv_craft.mill.recipes[input:get_name()]
+			local craft = frontier_craft.mill.recipes[input:get_name()]
 			if craft and craft.output:get_name() == stack:get_name() then
 				inv:remove_item("src", craft.input)
 			end
 			if inv:is_empty(listname, index) then
-				adv_craft.predict_mill_craft(pos)
+				frontier_craft.predict_mill_craft(pos)
 			end
 		end
 	end,
@@ -103,7 +103,7 @@ minetest.register_node("adv_craft:mill", {
 })
 
 minetest.register_craft({
-	output = "adv_craft:mill_wheel",
+	output = "frontier_craft:mill_wheel",
 	recipe = {
 		{"", "default:stone", ""},
 		{"default:stone", "", "default:stone"},
@@ -112,13 +112,13 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = "adv_craft:mill",
+	output = "frontier_craft:mill",
 	recipe = {
-		{"adv_craft:mill_wheel"},
+		{"frontier_craft:mill_wheel"},
 		{"group:wood"},
-		{"adv_craft:mill_wheel"}
+		{"frontier_craft:mill_wheel"}
 	},
 })
-adv_craft.register_mill_recipe("farming:seed_wheat 4", "farming:flour")
-adv_craft.register_mill_recipe("frontier_trees:apple 1", "adv_craft:apple_sauce")
+frontier_craft.register_mill_recipe("farming:seed_wheat 4", "farming:flour")
+frontier_craft.register_mill_recipe("frontier_trees:apple 1", "frontier_craft:apple_sauce")
 
