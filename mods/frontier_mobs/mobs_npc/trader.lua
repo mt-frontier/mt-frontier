@@ -14,26 +14,17 @@ mobs.traders.hunter = {
 	items = {
 		--{item for sale, price, inverse probability of appearing in trader's inventory}
 		-- Items for sale
-		{"default:clay 10", "mtcoin:gold 6", 12},
-		{"default:sand 9", "mtcoin:gold 6", 17},
-		{"farming:wheat 10", "mtcoin:gold 6", 17},
-		{"default:stick 4", "mtcoin:gold 1", 20},
-		{"default:cactus 2", "mtcoin:gold 3", 40},
-		{"bows:bow_wood 1", "mtcoin:gold 15", 2},
-		{"bows:arrow 9", "mtcoin:gold 9", 2},
-		{"crops:corn 1", "mtcoin:gold 1", 5},
-		{"crops:pumpkin 1", "mtcoin:gold 1", 5},
-		{"bows:arrow_toxic 9", "mtcoin:gold 24", 8},
+		{"farming:wheat_seed 9", "default:gold_ingot 1", 17},
+		{"bows:bow_wood 1", "default:gold_ingot 3", 2},
+		{"bows:arrow 9", "default:gold_ingot 1", 2},
+		{"crops:corn 1", "default:gold_ingot 1", 5},
+		{"crops:pumpkin 1", "default:gold_ingot 1", 5},
+		{"bows:arrow_toxic 9", "default:gold_ingot 1", 8},
 
 		--Items to buy
-		{"mtcoin:gold 3", "default:gold_ingot 1", 3},
-		{"mtcoin:copper 3", "default:copper_ingot 1", 2},
-		{"mtcoin:copper 6", "default:steel_ingot 1", 3},
-		{"mtcoin:copper 3", "default:tin_ingot 3", 4},
-		{"mtcoin:copper 10", "default:stone 99", 6},
-		{"mtcoin:copper 3", "mobs:chicken_feather 1", 4},
-		
-		{"mtcoin:gold 2", "mobs:cheese 1", 5},
+		{"default:gold_ingot 3", "default:steel_ingot_3", 6},
+		{"default:gold_ingot 3", "default:steel_pick", 4},
+		{"default:gold_ingot 2", "mobs:cheese 1", 5},
 	}
 }
 
