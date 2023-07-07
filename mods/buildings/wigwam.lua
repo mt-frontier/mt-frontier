@@ -1,7 +1,6 @@
 local schem_file = minetest.register_schematic("schems/wigwam.mts")
 local wigwam_loot = {
 	--item name, max # in stack, rarity
-	{"mtcoin:copper", 9, 8},
 	{"bows:bow_wood", 1, 10},
 	{"bows:arrow_steel", 9, 8},
 	{"bows:arrow", 48, 5},
@@ -11,10 +10,8 @@ local wigwam_loot = {
 	{"frontier_trees:apple", 9, 7},
 	{"farming:seed_cotton", 9, 8},
 	{"crops:corn", 9, 8},
-	{"crops:potato_eyes", 9, 8},
 	{"crops:pumpkin_seed", 9, 8},
 	{"crops:melon_seed", 9, 8},
-	{"default:blueberries", 9, 4},
 }
 
 wigwam_loot = buildings.sort_loot(wigwam_loot)

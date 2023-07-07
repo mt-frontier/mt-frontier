@@ -1,15 +1,14 @@
 local schem_file = minetest.register_schematic("schems/saloon.mts")
 local saloon_loot = {
 	--item name, max # in stack, rarity
-	{"mtcoin:gold", 9, 8},
+	{"default:gold_ingot", 3, 8},
 	{"bows:bow_wood", 1, 10},
 	{"bows:arrow_steel", 9, 8},
-	{"bows:arrow", 48, 5},
-	{"craftguide:book", 1, 10},
-	{"frontier_guns:shotgun_shell", 3, 14},
-	{"frontier_guns:shotgun", 1, 72},
-	{"frontier_guns:bullet", 2, 40},
-	{"frontier_guns:revolver", 1, 99},
+	{"bows:arrow", 18, 5},
+	{"frontier_guns:shotgun_shell", 4, 11},
+	{"frontier_guns:shotgun", 1, 14},
+	{"frontier_guns:bullet", 6, 12},
+	{"frontier_guns:revolver", 1, 18},
 }
 
 saloon_loot = buildings.sort_loot(saloon_loot)

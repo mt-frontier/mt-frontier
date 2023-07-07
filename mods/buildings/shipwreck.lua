@@ -1,12 +1,12 @@
 local schem_file = minetest.register_schematic("schems/shipwreck.mts")
 local shipwreck_loot = {
 	--item name, max # in stack, rarity
-	{"mtcoin:gold", 18, 9},
+	{"default:gold", 9, 9},
     {"default:gold_ingot", 9, 8},
-	{"frontier_guns:shotgun_shell", 6, 20},
-	{"frontier_guns:shotgun", 1, 48},
-	{"frontier_guns:bullet", 6, 10},
-	{"frontier_guns:revolver", 1, 48},
+	{"frontier_guns:shotgun_shell", 4, 10},
+	{"frontier_guns:shotgun", 1, 16},
+	{"frontier_guns:bullet", 6, 12},
+	{"frontier_guns:revolver", 1, 18},
 }
 
 shipwreck_loot = buildings.sort_loot(shipwreck_loot)

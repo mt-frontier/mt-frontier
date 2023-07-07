@@ -1,11 +1,11 @@
 local schem_file = minetest.register_schematic("schems/cabin.mts")
 local cabin_loot = {
 	--item name, max # in stack, rarity
-	{"mtcoin:gold", 9, 8},
+	{"default:gold_ingot", 3, 8},
+	{"default:torch", 9, 5},
 	{"bows:bow_wood", 1, 10},
 	{"bows:arrow", 36, 9},
 	{"default:pick_steel", 1, 10},
-	{"default:pick_bronze", 1, 8},
 	{"default:dagger_stone", 1, 9},
 	{"frontier_trees:apple", 9, 7},
 	{"farming:bread", 1, 8},
@@ -17,10 +17,8 @@ local cabin_loot = {
 	{"crops:potato_eyes", 9, 8},
 	{"crops:pumpkin_seed", 9, 8},
 	{"crops:melon_seed", 9, 8},
-	{"craftguide:book", 1, 10},
-	
-	{"frontier_guns:shotgun", 1, 24},
-	{"frontier_guns:shotgun_shell", 3, 18},
+	{"frontier_guns:shotgun", 1, 14},
+	{"frontier_guns:shotgun_shell", 6, 11},
 }
 
 cabin_loot = buildings.sort_loot(cabin_loot)

@@ -1,12 +1,11 @@
 local schem_file = minetest.register_schematic("schems/puebloan.mts")
 local puebloan_loot = {
 	--item name, max # in stack, rarity
-	{"mtcoin:copper", 9, 8},
 	{"bows:bow_wood", 1, 10},
 	{"bows:arrow_steel", 9, 8},
 	{"bows:arrow", 48, 5},
 	{"bows:arrow_poison", 9, 10},
-	{"default:pick_bronze", 1, 8},
+	{"default:pick_stone", 1, 8},
 	{"default:axe_stone", 1, 9},
 	{"frontier_trees:apple", 9, 7},
 	{"farming:seed_cotton", 9, 8},
@@ -14,7 +13,7 @@ local puebloan_loot = {
 	{"crops:potato_eyes", 9, 8},
 	{"crops:pumpkin_seed", 9, 8},
 	{"crops:melon_seed", 9, 8},
-	{"default:blueberries", 9, 4},
+	{"crops:tomato_seed", 9, 8},
 }
 
 puebloan_loot = buildings.sort_loot(puebloan_loot)

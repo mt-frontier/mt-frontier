@@ -1,4 +1,6 @@
+-- mods/default/tools.lua
 
+-- The hand
 minetest.register_item(":", {
 	type = "none",
 	wield_image = "wieldhand.png",
@@ -15,10 +17,12 @@ minetest.register_item(":", {
 	}
 })
 
+--
 -- Picks
-minetest.register_tool("frontier_tools:stone_pick", {
+--
+
+minetest.register_tool("default:pick_stone", {
 	description = "Stone Pickaxe",
-	--inventory_image = "frontier_tools_stone_pick.png",
 	inventory_image = "default_tool_stonepick.png",
 	tool_capabilities = {
 		full_punch_interval = 1.3,
@@ -31,23 +35,8 @@ minetest.register_tool("frontier_tools:stone_pick", {
 	sound = {breaks = "default_tool_breaks"},
 })
 
-minetest.register_tool("frontier_tools:tin_pick", {
-    description = "Tin Pickaxe",
-    inventory_image = "frontier_tools_tin_pick.png",
-    tool_capabilities = {
-        full_punch_interval = 0.9,
-        max_drop_level = 0,
-        groupcaps = {
-            cracky = {times={[2]=1.9, [3]=0.95}, uses = 12, max_level=1},
-        },
-        damage_groups = {fleshy=3},
-    },
-    sound = {breaks = "default_tool_breaks"},
-})
-
-minetest.register_tool("frontier_tools:steel_pick", {
+minetest.register_tool("default:pick_steel", {
 	description = "Steel Pickaxe",
-	--inventory_image = "frontier_tools_steel_pick.png",
 	inventory_image = "default_tool_steelpick.png",
 	tool_capabilities = {
 		full_punch_interval = 1.0,
@@ -59,12 +48,28 @@ minetest.register_tool("frontier_tools:steel_pick", {
 	},
 	sound = {breaks = "default_tool_breaks"},
 })
-
+--
 -- Shovels
-minetest.register_tool("frontier_tools:stone_shovel", {
+--
+
+minetest.register_tool("default:shovel_wood", {
+	description = "Wooden Shovel",
+	inventory_image = "default_tool_woodshovel.png",
+	wield_image = "default_tool_woodshovel.png^[transformR90",
+	tool_capabilities = {
+		full_punch_interval = 1.2,
+		max_drop_level=0,
+		groupcaps={
+			crumbly = {times={[1]=3.00, [2]=1.60, [3]=0.60}, uses=10, maxlevel=1},
+		},
+		damage_groups = {fleshy=2},
+	},
+	groups = {flammable = 2},
+	sound = {breaks = "default_tool_breaks"},
+})
+
+minetest.register_tool("default:shovel_stone", {
 	description = "Stone Shovel",
-	--inventory_image = "frontier_tools_stone_shovel.png",
-	--wield_image = "frontier_tools_stone_shovel.png^[transformR90",
 	inventory_image = "default_tool_stoneshovel.png",
 	wield_image = "default_tool_stoneshovel.png^[transformR90",
 	tool_capabilities = {
@@ -78,10 +83,8 @@ minetest.register_tool("frontier_tools:stone_shovel", {
 	sound = {breaks = "default_tool_breaks"},
 })
 
-minetest.register_tool("frontier_tools:steel_shovel", {
+minetest.register_tool("default:shovel_steel", {
 	description = "Steel Shovel",
-	--inventory_image = "frontier_tools_steel_shovel.png",
-	--wield_image = "frontier_tools_steelshovel.png^[transformR90",
 	inventory_image = "default_tool_steelshovel.png",
 	wield_image = "default_tool_steelshovel.png^[transformR90",
 	tool_capabilities = {
@@ -95,10 +98,13 @@ minetest.register_tool("frontier_tools:steel_shovel", {
 	sound = {breaks = "default_tool_breaks"},
 })
 
+--
 -- Axes
-minetest.register_tool("frontier_tools:stone_axe", {
+--
+
+minetest.register_tool("default:axe_stone", {
 	description = "Stone Axe",
-	inventory_image = "frontier_tools_stone_axe.png",
+	inventory_image = "default_tool_stoneaxe.png",
 	tool_capabilities = {
 		full_punch_interval = 1.2,
 		max_drop_level=0,
@@ -110,9 +116,8 @@ minetest.register_tool("frontier_tools:stone_axe", {
 	sound = {breaks = "default_tool_breaks"},
 })
 
-minetest.register_tool("frontier_tools:steel_axe", {
+minetest.register_tool("default:axe_steel", {
 	description = "Steel Axe",
-	--inventory_image = "frontier_tools_steel_axe.png",
 	inventory_image = "default_tool_steelaxe.png",
 	tool_capabilities = {
 		full_punch_interval = 1.0,
@@ -125,13 +130,13 @@ minetest.register_tool("frontier_tools:steel_axe", {
 	sound = {breaks = "default_tool_breaks"},
 })
 
--- Knives
+-- Daggers
 --
-minetest.register_tool("frontier_tools:stone_knife", {
-	description = "Stone Knife ",
-	inventory_image = "frontier_tools_stone_knife.png",
+minetest.register_tool("default:dagger_stone", {
+	description = "Stone Dagger",
+	inventory_image = "default_tool_stonedagger.png",
 	tool_capabilities = {
-		full_punch_interval = 0.9,
+		full_punch_interval = 0.8,
 		max_drop_level = 1,
 		groupcaps = {
 			snappy = {times={[1]=4.0, [2]=3.2, [3]=2.4}, uses=20, maxlevel=3},
@@ -141,9 +146,9 @@ minetest.register_tool("frontier_tools:stone_knife", {
 	sound = {breaks = "default_tool_breaks"},
 })
 
-minetest.register_tool("frontier_tools:steel_knife", {
-	description = "Steel Knife",
-	inventory_image = "frontier_tools_steel_knife.png",
+minetest.register_tool("default:dagger_steel", {
+	description = "Steel Dagger",
+	inventory_image = "default_tool_steeldagger.png",
 	tool_capabilities = {
 		full_punch_interval = 0.6,
 		max_drop_level = 1,
@@ -154,29 +159,10 @@ minetest.register_tool("frontier_tools:steel_knife", {
 	},
 	sound = {breaks = "default_tool_breaks"},
 })
-
--- hoes
-
-farming.register_hoe("frontier_tools:stone_hoe", {
-	description = "Stone Hoe",
-	inventory_image = "frontier_tools_stone_hoe.png",
-	max_uses = 40,
-	material = "group:stone",
-	groups = {hoe = 1}
-})
-
-farming.register_hoe("frontier_tools:steel_hoe", {
-	description = "Steel Hoe",
-	inventory_image = "frontier_tools_steel_hoe.png",
-	max_uses = 60,
-	material = "default:steel_ingot",
-	groups = {hoe = 1}
-})
-
 --
 -- Misc
--- from minetest_game
-minetest.register_tool("frontier_tools:key", {
+--
+minetest.register_tool("default:key", {
 	description = "Key",
 	inventory_image = "default_key.png",
 	groups = {key = 1, not_in_creative_inventory = 1},
@@ -215,6 +201,3 @@ minetest.register_tool("frontier_tools:key", {
 		return nil
 	end
 })
-
-
-dofile(minetest.get_modpath("frontier_tools") .. "/crafts.lua")

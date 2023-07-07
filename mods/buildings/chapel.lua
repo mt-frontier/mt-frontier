@@ -1,9 +1,8 @@
 local schem_file = minetest.register_schematic("schems/chapel.mts")
 local chapel_loot = {
 	--item name, max # in stack, rarity
-	{"mtcoin:gold", 3, 13},
+	{"default:gold_ingot", 3, 13},
 	{"farming:bread", 3, 8},
-	{"craftguide:book", 1, 10},
     {"default:book", 1, 9},
     {"default:paper", 9, 9},
 }
