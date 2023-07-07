@@ -10,10 +10,10 @@ local igloo_loot = {
 	{"default:axe_steel", 1, 7},
 	{"frontier_trees:apple", 9, 7},
 	{"fire:flint_and_steel", 1, 6},
-	{"frontier_guns:shotgun_shell", 3, 14},
-	{"frontier_guns:shotgun", 1, 48},
-	{"frontier_guns:bullet", 2, 20},
-	{"frontier_guns:revolver", 1, 64},
+	{"frontier_guns:shotgun_shell", 4, 8},
+	{"frontier_guns:shotgun", 1, 11},
+	{"frontier_guns:bullet", 6, 9},
+	{"frontier_guns:revolver", 1, 12},
 	{"mobs:meat", 9, 6},
 }
 
