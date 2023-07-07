@@ -2782,12 +2782,6 @@ default.register_leafdecay({
 })
 
 default.register_leafdecay({
-	trunks = {"default:acacia_tree"},
-	leaves = {"default:acacia_leaves"},
-	radius = 2,
-})
-
-default.register_leafdecay({
 	trunks = {"default:aspen_tree"},
 	leaves = {"default:aspen_leaves"},
 	radius = 3,

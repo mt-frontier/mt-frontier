@@ -78,7 +78,7 @@ minetest.register_lbm({
 	action = function(pos, node)
 		minetest.remove_node(pos)
 		pos.y = pos.y - 1
-		if buildings.check_foundation(pos, 12, 12, "cools_lava") < 4 then
+		if buildings.check_foundation(pos, 12, 12, "snowy") < 4 then
 			return
 		end
 		minetest.place_schematic(pos, schem_file, "random", nil, true, {"place_center_x", "place_center_z", "place_center_y"})
