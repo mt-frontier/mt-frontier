@@ -1,11 +1,11 @@
 frontier_craft.anvil = {}
 frontier_craft.anvil.recipes = {}
-		local formspec = "size[8,9]" ..
-			"label[1.5,0;Available crafts based on player's skill and inventory]" ..
-			--"list[detached:anvil;in;3.5,1;1,1;]" ..
-			--"label[3.35,2;Place ingots]" ..
-			"list[detached:anvil;out;1.5,1;5,3;]" ..
-			"list[current_player;main;0,5;8,4;]"
+local formspec = "size[8,9]" ..
+	"label[1.5,0;Available crafts based on player's skill and inventory]" ..
+	--"list[detached:anvil;in;3.5,1;1,1;]" ..
+	--"label[3.35,2;Place ingots]" ..
+	"list[detached:anvil;out;1.5,1;5,3;]" ..
+	"list[current_player;main;0,5;8,4;]"
 
 function frontier_craft.anvil.register_craft(output, inputs)
 	frontier_craft.anvil.recipes[output] = inputs
@@ -123,11 +123,3 @@ function frontier_craft.anvil.register_toolset_craft(material)
 		)
 	end
 end
-
---frontier_craft.anvil.register_toolset("tin")
---frontier_craft.anvil.register_toolset("bronze")
---frontier_craft.anvil.register_toolset("steel")
-
---frontier_craft.anvil.register_craft("default:pick_steel", {"default:steel_ingot 3", "default:stick"})
-
-

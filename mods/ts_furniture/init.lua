@@ -84,38 +84,6 @@ local furnitures = {
 		end,
 		burntime = 25,
 	},
-	["small_table"] = {
-		description = "Small Table",
-		nodebox = {
-			{ -0.4, -0.5, -0.4, -0.3, 0.1, -0.3 }, -- foot 1
-			{ 0.3, -0.5, -0.4, 0.4, 0.1, -0.3 }, -- foot 2
-			{ -0.4, -0.5, 0.3, -0.3, 0.1, 0.4 }, -- foot 3
-			{ 0.3, -0.5, 0.3, 0.4, 0.1, 0.4 }, -- foot 4
-			{ -0.5, 0.1, -0.5, 0.5, 0.2, 0.5 }, -- table top
-		},
-		craft = function(recipe)
-			return {
-				{ recipe, recipe, recipe },
-				{ "group:stick", "", "group:stick" }
-			}
-		end,
-		burntime = 23,
-	},
-	["tiny_table"] = {
-		description = "Tiny Table",
-		nodebox = {
-			{ -0.5, -0.1, -0.5, 0.5, 0, 0.5 }, -- table top
-			{ -0.4, -0.5, -0.5, -0.3, -0.1, 0.5 }, -- foot 1
-			{ 0.3, -0.5, -0.5, 0.4, -0.1, 0.5 }, -- foot 2
-		},
-		craft = function(recipe)
-			local bench_name = "ts_furniture:" .. recipe:gsub(":", "_") .. "_bench"
-			return {
-				{ bench_name, bench_name }
-			}
-		end,
-		burntime = 20,
-	},
 	["bench"] = {
 		description = "Bench",
 		sitting = true,
@@ -145,7 +113,7 @@ local furnitures = {
 			{ -1/2, 1/4, 7/16, 1/2, 5/16, 3/8},
 			{-1/2, -3/16, 7/16, 1/2, -1/4, 3/8},
 		},
-		groups = {choppy = 2, oddly_breakable_by_hand = 3, flammable = 2},
+		groups = {choppy = 3, oddly_breakable_by_hand = 3, flammable = 2},
 		craft = function(recipe)
 			return {
 				{ "group:stick", "", "group:stick"},
@@ -250,6 +218,9 @@ function ts_furniture.register_furniture(recipe, description, texture)
 				local name = clicker:get_player_name()
 				local meta = minetest.get_meta(pos)
 				local state = minetest.get_node(pos)
+				if minetest.is_protected(pos, name) == true then
+					return
+				end
 				local formspec = 
 					"size[".. tostring(4+rows) .. ",9]" ..
 					"list[nodemeta:"..pos.x..","..pos.y..","..pos.z .. ";main;0,0;8,".. tostring(rows) ..";]"..
@@ -280,7 +251,7 @@ function ts_furniture.register_furniture(recipe, description, texture)
 			fixed = def.nodebox
 		}
 		if def.on_construct then 
-			node_def.on_construct = def.on_construct 
+			node_def.on_construct = def.on_construct
 		end
 
 		if def.on_rightclick then
@@ -289,35 +260,32 @@ function ts_furniture.register_furniture(recipe, description, texture)
 
 		if def.can_dig then
 			node_def.can_dig = def.can_dig
-		end	
+		end
 		if def.toggle then
 			local nn1 = node_name .."_closed"
 			local nn2 = node_name .. "_open"
 			minetest.register_node(":" .. nn1, node_def)
-			node_def2 = {} 
-			--node_def2.on_rightclick = function(pos, node, clicker)
-			--	minetest.swap_node(pos, {name = nn1})
-		--	end
-			--node_def.on_construct = nil
-			node_def2.drop = {node_name}
+			node_def2 = {}
 			for k, v in pairs(node_def) do
 				if node_def2[k] == nil then
 					node_def2[k] = v
 				end
 			end
+			node_def2.drop = nn1
+			--node_def2.groups["not_in_creative_inventory"] = 1
 			node_def2.node_box.fixed = def.toggle_nodebox
 			minetest.register_node(":" .. nn2, node_def2)
 			node_name = nn1
 		else
 			minetest.register_node(":" .. node_name, node_def)
-		end	
+		end
 
-		
+
 		minetest.register_craft({
 			output = node_name,
 			recipe = def.craft(recipe)
 		})
-		
+
 		if def.burntime then
 			minetest.register_craft({
 				type = "fuel",
@@ -327,11 +295,7 @@ function ts_furniture.register_furniture(recipe, description, texture)
 		end
 	end
 end
---ts_furniture.register_furniture("default:aspen_wood", "Aspen", "default_aspen_wood.png")
---ts_furniture.register_furniture("default:pine_wood", "Pine", "default_pine_wood.png")
---ts_furniture.register_furniture("default:acacia_wood", "Acacia", "default_acacia_wood.png")
---ts_furniture.register_furniture("default:wood", "Wooden", "default_wood.png")
---ts_furniture.register_furniture("default:junglewood", "Jungle Wood", "default_junglewood.png")
+
 ts_furniture.register_furniture("default:pine_wood", "Pine", "default_pine_wood.png")
 ts_furniture.register_furniture("frontier_trees:apple_wood", "Apple", "frontier_trees_apple_wood.png")
 ts_furniture.register_furniture("frontier_trees:maple_wood", "Maple", "frontier_trees_maple_wood.png")
@@ -339,28 +303,3 @@ ts_furniture.register_furniture("frontier_trees:cypress_wood", "Cypress", "front
 ts_furniture.register_furniture("frontier_trees:mesquite_wood", "Mesquite", "frontier_trees_mesquite_wood.png")
 ts_furniture.register_furniture("frontier_trees:poplar_wood", "Poplar", "frontier_trees_poplar_wood.png")
 
-if (minetest.get_modpath("moretrees")) then
-	ts_furniture.register_furniture("moretrees:apple_tree_planks", "Apple Tree", "moretrees_apple_tree_wood.png")
-	ts_furniture.register_furniture("moretrees:beech_planks", "Beech", "moretrees_beech_wood.png")
-	ts_furniture.register_furniture("moretrees:birch_planks", "Birch", "moretrees_birch_wood.png")
-	ts_furniture.register_furniture("moretrees:fir_planks", "Fir", "moretrees_fir_wood.png")
-	ts_furniture.register_furniture("moretrees:oak_planks", "Oak", "moretrees_oak_wood.png")
-	ts_furniture.register_furniture("moretrees:palm_planks", "Palm", "moretrees_palm_wood.png")
-	ts_furniture.register_furniture("moretrees:rubber_tree_planks", "Rubber Tree", "moretrees_rubber_tree_wood.png")
-	ts_furniture.register_furniture("moretrees:sequoia_planks", "Sequoia", "moretrees_sequoia_wood.png")
-	ts_furniture.register_furniture("moretrees:spruce_planks", "Spruce", "moretrees_spruce_wood.png")
-	ts_furniture.register_furniture("moretrees:willow_planks", "Willow", "moretrees_willow_wood.png")
-end
-
-if minetest.get_modpath("ethereal") then
-	ts_furniture.register_furniture("ethereal:banana_wood", "Banana", "banana_wood.png")
-	ts_furniture.register_furniture("ethereal:birch_wood", "Birch", "moretrees_birch_wood.png")
-	ts_furniture.register_furniture("ethereal:frost_wood", "Frost", "frost_wood.png")
-	ts_furniture.register_furniture("ethereal:mushroom_trunk", "Mushroom", "mushroom_trunk.png")
-	ts_furniture.register_furniture("ethereal:palm_wood", "Palm", "moretrees_palm_wood.png")
-	ts_furniture.register_furniture("ethereal:redwood_wood", "Redwood", "redwood_wood.png")
-	ts_furniture.register_furniture("ethereal:sakura_wood", "Sakura", "ethereal_sakura_wood.png")
-	ts_furniture.register_furniture("ethereal:scorched_tree", "Scorched", "scorched_tree.png")
-	ts_furniture.register_furniture("ethereal:willow_wood", "Willow", "willow_wood.png")
-	ts_furniture.register_furniture("ethereal:yellow_wood", "Healing Tree", "yellow_wood.png")
-end

@@ -202,7 +202,7 @@ minetest.register_node("vessels:apple_butter_jar", {
 minetest.register_craft({
 	output = "vessels:apple_butter_jar",
 	recipe = {
-		{"", "default:tin_ingot", ""},
+		{"", "default:steel_ingot", ""},
 		{"adv_craft:apple_sauce", "adv_craft:apple_sauce", "adv_craft:apple_sauce",},
 		{"", "vessels:glass_jar", ""}
 	}
@@ -229,7 +229,7 @@ minetest.register_node("vessels:blueberry_jam_jar", {
 minetest.register_craft({
 	output = "vessels:blueberry_jam_jar",
 	recipe = {
-		{"", "default:tin_ingot", ""},
+		{"", "default:steel_ingot", ""},
 		{"default:blueberries", "default:blueberries", "default:blueberries",},
 		{"", "vessels:glass_jar", ""}
 	}
@@ -256,7 +256,7 @@ minetest.register_node("vessels:maple_syrup_jar", {
 minetest.register_craft({
 	output = "vessels:maple_syrup_jar 3",
 	recipe = {
-		{"default:tin_ingot", "default:tin_ingot", "default:tin_ingot"},
+		{"default:steel_ingot", "default:steel_ingot", "default:steel_ingot"},
 		{"", "frontier_trees:syrup_bucket", "" },
 		{"vessels:glass_jar", "vessels:glass_jar", "vessels:glass_jar"}
 	}

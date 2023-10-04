@@ -1,4 +1,4 @@
-local currency = "mtcoin:gold"
+local currency = "default:gold_ingot"
 
 minetest.unregister_item("simple_protection:claim")
 
@@ -8,7 +8,7 @@ local function can_claim(player_name, pos)
     local reason = ""
     local claims, count = s_protect.get_player_claims(player_name)
     local price = 300
-    if count == 0 then 
+    if count == 0 then
         price = 0
     elseif count < 4 then
         price = 100

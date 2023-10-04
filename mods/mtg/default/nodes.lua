@@ -111,14 +111,6 @@ default:coalblock
 default:stone_with_iron
 default:steelblock
 
-default:stone_with_copper
-default:copperblock
-
-default:stone_with_tin
-default:tinblock
-
-default:bronzeblock
-
 default:stone_with_gold
 default:goldblock
 
@@ -489,6 +481,25 @@ minetest.register_node("default:dirt_with_coniferous_litter", {
 	},
 	groups = {crumbly = 3, soil = 1, spreading_dirt_type = 1},
 	drop = "default:dirt",
+	sounds = default.node_sound_dirt_defaults({
+		footstep = {name = "default_grass_footstep", gain = 0.4},
+	}),
+})
+
+minetest.register_node("default:dry_dirt", {
+	description = "Savanna Dirt",
+	tiles = {"default_dry_dirt.png"},
+	groups = {crumbly = 3, soil = 1},
+	sounds = default.node_sound_dirt_defaults(),
+})
+
+minetest.register_node("default:dry_dirt_with_dry_grass", {
+	description = "Savanna Dirt with Savanna Grass",
+	tiles = {"default_dry_grass.png", "default_dry_dirt.png",
+		{name = "default_dry_dirt.png^default_dry_grass_side.png",
+			tileable_vertical = false}},
+	groups = {crumbly = 3, soil = 1},
+	drop = "default:dry_dirt",
 	sounds = default.node_sound_dirt_defaults({
 		footstep = {name = "default_grass_footstep", gain = 0.4},
 	}),
@@ -1164,68 +1175,6 @@ minetest.register_node("default:steelblock", {
 	sounds = default.node_sound_metal_defaults(),
 })
 
-
-minetest.register_node("default:stone_with_copper", {
-	description = "Copper Ore",
-	tiles = {"default_stone.png^default_mineral_copper.png"},
-	groups = {cracky = 2},
-	drop = 'default:copper_lump',
-	sounds = default.node_sound_stone_defaults(),
-})
-
-minetest.register_node("default:copperblock", {
-	description = "Copper Block",
-	tiles = {"default_copper_block.png"},
-	is_ground_content = false,
-	groups = {cracky = 1, level = 2},
-	sounds = default.node_sound_metal_defaults(),
-})
-
-
-minetest.register_node("default:stone_with_tin", {
-	description = "Tin Ore",
-	tiles = {"default_stone.png^default_mineral_tin.png"},
-	groups = {cracky = 2},
-	drop = "default:tin_lump",
-	sounds = default.node_sound_stone_defaults(),
-})
-
-minetest.register_node("default:tinblock", {
-	description = "Tin Block",
-	tiles = {"default_tin_block.png"},
-	is_ground_content = false,
-	groups = {cracky = 1, level = 2},
-	sounds = default.node_sound_metal_defaults(),
-})
-
-
-minetest.register_node("default:bronzeblock", {
-	description = "Bronze Block",
-	tiles = {"default_bronze_block.png"},
-	is_ground_content = false,
-	groups = {cracky = 1, level = 2},
-	sounds = default.node_sound_metal_defaults(),
-})
-
---[[
-minetest.register_node("default:stone_with_mese", {
-	description = "Mese Ore",
-	tiles = {"default_stone.png^default_mineral_mese.png"},
-	groups = {cracky = 1},
-	drop = "default:mese_crystal",
-	sounds = default.node_sound_stone_defaults(),
-})
-
-minetest.register_node("default:mese", {
-	description = "Mese Block",
-	tiles = {"default_mese_block.png"},
-	paramtype = "light",
-	groups = {cracky = 1, level = 2},
-	sounds = default.node_sound_stone_defaults(),
-	light_source = 3,
-})
-]]--
-
 minetest.register_node("default:stone_with_gold", {
 	description = "Gold Ore",
 	tiles = {"default_stone.png^default_mineral_gold.png"},
@@ -1242,23 +1191,6 @@ minetest.register_node("default:goldblock", {
 	sounds = default.node_sound_metal_defaults(),
 })
 
---[[
-minetest.register_node("default:stone_with_diamond", {
-	description = "Diamond Ore",
-	tiles = {"default_stone.png^default_mineral_diamond.png"},
-	groups = {cracky = 1},
-	drop = "default:diamond",
-	sounds = default.node_sound_stone_defaults(),
-})
-
-minetest.register_node("default:diamondblock", {
-	description = "Diamond Block",
-	tiles = {"default_diamond_block.png"},
-	is_ground_content = false,
-	groups = {cracky = 1, level = 3},
-	sounds = default.node_sound_stone_defaults(),
-})
-]]--
 --
 -- Plantlife (non-cubic)
 --
@@ -1344,27 +1276,6 @@ minetest.register_node("default:large_cactus_seedling", {
 	end,
 })
 
-minetest.register_node("default:papyrus", {
-	description = "Papyrus",
-	drawtype = "plantlike",
-	tiles = {"default_papyrus.png"},
-	inventory_image = "default_papyrus.png",
-	wield_image = "default_papyrus.png",
-	paramtype = "light",
-	sunlight_propagates = true,
-	walkable = false,
-	selection_box = {
-		type = "fixed",
-		fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 0.5, 6 / 16},
-	},
-	groups = {snappy = 3, flammable = 2},
-	sounds = default.node_sound_leaves_defaults(),
-
-	after_dig_node = function(pos, node, metadata, digger)
-		default.dig_up(pos, node, digger)
-	end,
-})
-
 minetest.register_node("default:dry_shrub", {
 	description = "Dry Shrub",
 	drawtype = "plantlike",
@@ -1385,27 +1296,6 @@ minetest.register_node("default:dry_shrub", {
 		fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 4 / 16, 6 / 16},
 	},
 })
-
-minetest.register_node("default:junglegrass", {
-	description = "Jungle Grass",
-	drawtype = "plantlike",
-	waving = 1,
-	visual_scale = 1.69,
-	tiles = {"default_junglegrass.png"},
-	inventory_image = "default_junglegrass.png",
-	wield_image = "default_junglegrass.png",
-	paramtype = "light",
-	sunlight_propagates = true,
-	walkable = false,
-	buildable_to = true,
-	groups = {snappy = 3, flora = 1, attached_node = 1, flammable = 1},
-	sounds = default.node_sound_leaves_defaults(),
-	selection_box = {
-		type = "fixed",
-		fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, 0.5, 6 / 16},
-	},
-})
-
 
 minetest.register_node("default:grass_1", {
 	description = "Grass",
@@ -1439,6 +1329,7 @@ for i = 2, 5 do
 	minetest.register_node("default:grass_" .. i, {
 		description = "Grass",
 		drawtype = "plantlike",
+		visual_scale = 1.4,
 		waving = 1,
 		tiles = {"default_grass_" .. i .. ".png"},
 		inventory_image = "default_grass_" .. i .. ".png",
@@ -1491,6 +1382,7 @@ for i = 2, 5 do
 	minetest.register_node("default:dry_grass_" .. i, {
 		description = "Dry Grass",
 		drawtype = "plantlike",
+		visual_scale = 1.4,
 		waving = 1,
 		tiles = {"default_dry_grass_" .. i .. ".png"},
 		inventory_image = "default_dry_grass_" .. i .. ".png",
@@ -2247,98 +2139,6 @@ minetest.register_node("default:river_water_flowing", {
 	sounds = default.node_sound_water_defaults(),
 })
 
-
-minetest.register_node("default:lava_source", {
-	description = "Lava Source",
-	drawtype = "liquid",
-	tiles = {
-		{
-			name = "default_lava_source_animated.png",
-			backface_culling = false,
-			animation = {
-				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
-				length = 3.0,
-			},
-		},
-		{
-			name = "default_lava_source_animated.png",
-			backface_culling = true,
-			animation = {
-				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
-				length = 3.0,
-			},
-		},
-	},
-	paramtype = "light",
-	light_source = default.LIGHT_MAX - 1,
-	walkable = false,
-	pointable = false,
-	diggable = false,
-	buildable_to = true,
-	is_ground_content = false,
-	drop = "",
-	drowning = 1,
-	liquidtype = "source",
-	liquid_alternative_flowing = "default:lava_flowing",
-	liquid_alternative_source = "default:lava_source",
-	liquid_viscosity = 7,
-	liquid_renewable = false,
-	damage_per_second = 4 * 2,
-	post_effect_color = {a = 191, r = 255, g = 64, b = 0},
-	groups = {lava = 3, liquid = 2, igniter = 1},
-})
-
-minetest.register_node("default:lava_flowing", {
-	description = "Flowing Lava",
-	drawtype = "flowingliquid",
-	tiles = {"default_lava.png"},
-	special_tiles = {
-		{
-			name = "default_lava_flowing_animated.png",
-			backface_culling = false,
-			animation = {
-				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
-				length = 3.3,
-			},
-		},
-		{
-			name = "default_lava_flowing_animated.png",
-			backface_culling = true,
-			animation = {
-				type = "vertical_frames",
-				aspect_w = 16,
-				aspect_h = 16,
-				length = 3.3,
-			},
-		},
-	},
-	paramtype = "light",
-	paramtype2 = "flowingliquid",
-	light_source = default.LIGHT_MAX - 1,
-	walkable = false,
-	pointable = false,
-	diggable = false,
-	buildable_to = true,
-	is_ground_content = false,
-	drop = "",
-	drowning = 1,
-	liquidtype = "flowing",
-	liquid_alternative_flowing = "default:lava_flowing",
-	liquid_alternative_source = "default:lava_source",
-	liquid_viscosity = 7,
-	liquid_renewable = false,
-	damage_per_second = 4 * 2,
-	post_effect_color = {a = 191, r = 255, g = 64, b = 0},
-	groups = {lava = 3, liquid = 2, igniter = 1,
-		not_in_creative_inventory = 1},
-})
-
 --
 -- Tools / "Advanced" crafting / Non-"natural"
 --
@@ -2675,19 +2475,6 @@ minetest.register_node("default:glass", {
 	groups = {cracky = 3, oddly_breakable_by_hand = 3},
 	sounds = default.node_sound_glass_defaults(),
 })
-
-minetest.register_node("default:obsidian_glass", {
-	description = "Obsidian Glass",
-	drawtype = "glasslike_framed_optional",
-	tiles = {"default_obsidian_glass.png", "default_obsidian_glass_detail.png"},
-	paramtype = "light",
-	paramtype2 = "glasslikeliquidlevel",
-	is_ground_content = false,
-	sunlight_propagates = true,
-	sounds = default.node_sound_glass_defaults(),
-	groups = {cracky = 3},
-})
-
 
 minetest.register_node("default:brick", {
 	description = "Brick Block",

@@ -1,10 +1,10 @@
 minetest.register_node("frontier_craft:candle", {
 	description = "Candle",
 	drawtype = "plantlike",
-	inventory_image = "adv_craft_candle_inv.png",
-	wield_image = "adv_craft_candle_inv.png",
+	inventory_image = "frontier_craft_candle_inv.png",
+	wield_image = "frontier_craft_candle_inv.png",
 	tiles = {{
-		    name = "adv_craft_candle.png",
+		    name = "frontier_craft_candle.png",
 		    animation = {type = "vertical_frames", aspect_w = 16, aspect_h = 16, length = 3.3}
 	}},
 	walkable = false,
@@ -23,17 +23,17 @@ minetest.register_craft({
 	recipe = {
 		{"farming:string", "farming:string", "farming:string"},
 		{"mobs:beeswax", "mobs:beeswax", "mobs:beeswax"},
-		{"", "default:tin_ingot", ""},	
+		{"", "default:steel_ingot", ""},
 	}
 })
 
 minetest.register_node("frontier_craft:lantern", {
 	description = "Lantern",
 	drawtype = "plantlike",
-	inventory_image = "adv_craft_lantern_inv.png",
-	wield_image = "adv_craft_lantern_inv.png",
+	inventory_image = "frontier_craft_lantern_inv.png",
+	wield_image = "frontier_craft_lantern_inv.png",
 	tiles = {{
-		    name = "adv_craft_lantern.png",
+		    name = "frontier_craft_lantern.png",
 		    animation = {type = "vertical_frames", aspect_w = 16, aspect_h = 16, length = 3.3}
 	}},
 	walkable = false,

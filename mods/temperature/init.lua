@@ -35,27 +35,27 @@ function temperature.get_adjusted_temp(pos)
 	temp = temp + light_level
 	-- special nodes in proximity impacting temperature
 	local heat_nodes = minetest.find_nodes_in_area(
-		vector.subtract(pos, 2), 
-		vector.add(pos, 2), 
+		vector.subtract(pos, 2),
+		vector.add(pos, 2),
 		{
-			"group:igniter", 
-			"default:furnace_active", 
-			"fake_fire:embers", 
-			"fake_fire:fake_fire", 
-			"fake_fire:fake_fire_d", 
+			"group:igniter",
+			"default:furnace_active",
+			"fake_fire:embers",
+			"fake_fire:fake_fire",
+			"fake_fire:fake_fire_d",
 			"fake_fire:smokeless_fire",
 		}
 	)
-	
+
 	local cool_nodes = minetest.find_nodes_in_area(
 		vector.subtract(pos, 0.5),
-		vector.add(pos, 0.5), 
+		vector.add(pos, 0.5),
 		{"group:cools_lava"}
 	)
 	
 	local heat = 10 * #heat_nodes
 	local cool = #cool_nodes
-	temp = temp + heat - cool	
+	temp = temp + heat - cool
 	return temp
 end
 
