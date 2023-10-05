@@ -7,6 +7,7 @@ minetest.register_craftitem("frontier_craft:mill_wheel", {
 	wield_iamge = "frontier_craft_mill_wheel.png"
 })
 
+
 function frontier_craft.register_mill_recipe(input, output)
 	local input_stack = ItemStack(input)
 	local output_stack = ItemStack(output)
@@ -15,6 +16,7 @@ function frontier_craft.register_mill_recipe(input, output)
 		output = output_stack,
 	}
 end
+
 
 function frontier_craft.predict_mill_craft(pos)
 	local meta = minetest.get_meta(pos)
@@ -32,7 +34,6 @@ function frontier_craft.predict_mill_craft(pos)
 		return inv:set_stack("out", 1, craft.output)
 	end
 	inv:set_stack("out", 1, ItemStack(""))
-
 end
 
 minetest.register_node("frontier_craft:mill", {
@@ -119,6 +120,6 @@ minetest.register_craft({
 		{"frontier_craft:mill_wheel"}
 	},
 })
+
 frontier_craft.register_mill_recipe("farming:seed_wheat 4", "farming:flour")
 frontier_craft.register_mill_recipe("frontier_trees:apple 1", "frontier_craft:apple_sauce")
-

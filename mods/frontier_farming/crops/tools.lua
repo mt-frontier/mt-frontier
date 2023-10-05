@@ -68,6 +68,9 @@ minetest.register_tool("crops:watering_can", {
 		minetest.sound_play("crops_watercan_watering", {pos=pos, gain=0.8})
 		water = math.min(water + crops.settings.watercan, crops.settings.watercan_max)
 		meta:set_int("crops_water", water)
+		-- Wet farming soil underneath if dry
+		local soil_pos = {x=pos.x, y=pos.y-1, z=pos.z}
+		farming.wet_soil_in_area(soil_pos, 1)
 
 		if not minetest.settings:get_bool("creative_mode") then
 			itemstack:set_wear(math.min(65534, wear + (65535 / crops.settings.watercan_uses)))

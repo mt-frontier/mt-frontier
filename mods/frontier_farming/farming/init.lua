@@ -13,7 +13,6 @@ farming.get_translator = S
 
 dofile(farming.path .. "/api.lua")
 dofile(farming.path .. "/nodes.lua")
-dofile(farming.path .. "/hoes.lua")
 
 
 -- WHEAT
@@ -135,8 +134,3 @@ minetest.register_craft({
 	burntime = 1,
 })
 
-minetest.register_craft({
-	type = "fuel",
-	recipe = "farming:hoe_wood",
-	burntime = 5,
-})

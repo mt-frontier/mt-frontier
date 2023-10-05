@@ -12,7 +12,7 @@ end
 	
 minetest.register_on_joinplayer(function(player)
 	local meta = player:get_meta()
-	local pos_str = meta:get_string("home") 
+	local pos_str = meta:get_string("home")
 	if pos_str == "" then
 		return
 	end
