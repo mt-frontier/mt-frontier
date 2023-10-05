@@ -2,12 +2,20 @@ temperature = {}
 temperature.registered_on_temp_tick = {}
 local huds = {}
 local temp_tick = 5
-local freezing_temp = 40
-local overheating_temp = 80
-local base_exhaust_level = 5
-
+local temp_tick = 5
+local cold_temp = 40
+local hot_temp = 80
+-- Api 
 function temperature.get_temp_tick()
 	return temp_tick
+end
+
+function temperature.get_cold_temp()
+	return cold_temp
+end
+
+function temperature.get_hot_temp()
+	return hot_temp
 end
 
 function temperature.get_adjusted_temp(pos)
@@ -25,10 +33,10 @@ function temperature.get_adjusted_temp(pos)
 	-- Elevation
 	temp = temp - elevation_diff
 	-- Time of day
-	if timeofday < 0.25 then -- Early morning
-		temp = temp - 8
-	elseif timeofday > 0.5 and timeofday < 0.7 then -- Afternoon
-		temp = temp + 5
+	if timeofday < 0.25 then -- Early morning make it cooler
+		temp = temp - math.floor(timeofday*10)
+	elseif timeofday > 0.4 and timeofday < 0.75 then -- Afternoon, make it hotter
+		temp = temp + math.floor(timeofday*10)
 	end
 	-- Light level
 	local light_level = minetest.get_node_light(above) or 0
@@ -134,9 +142,13 @@ minetest.register_globalstep(function(dt)
 			local temp = temperature.get_adjusted_temp(pos)
 			huds_update(player)
 			for _, func in ipairs(temperature.registered_on_temp_tick) do
-				func(player)
+				func(player, temp)
 			end	
 		end
 		temp_timer = 0
 	end
 end)
+
+if stamina ~= nil then
+	dofile(minetest.get_modpath("temperature") .. "/stamina.lua")
+end

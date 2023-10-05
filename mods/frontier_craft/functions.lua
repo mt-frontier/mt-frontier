@@ -272,6 +272,10 @@ function frontier_craft.perform_craft(player, craft_type, output, times)
             input_stack:set_count(input_stack:get_count() * times)
             player_inv:remove_item("main", input_stack)
         end
+           -- Stamina support
+        if stamina ~= nil then
+            stamina.exhaust_player(player, ItemStack(output):get_count()*times*5, "crafting")
+        end
         -- Tool wear for required_items
         print("output: ", output)
         local required_item = frontier_craft.registered_crafts[craft_type][output].required_item
