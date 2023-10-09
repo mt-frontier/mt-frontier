@@ -1,3 +1,4 @@
+-- Increase exhaustion in extreme temperatures
 temperature.register_on_temp_tick(function(player,temp)
     local hot = temperature.get_hot_temp()
     local cold = temperature.get_cold_temp()

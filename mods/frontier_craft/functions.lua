@@ -274,7 +274,7 @@ function frontier_craft.perform_craft(player, craft_type, output, times)
         end
            -- Stamina support
         if stamina ~= nil then
-            stamina.exhaust_player(player, ItemStack(output):get_count()*times*5, "crafting")
+            stamina.exhaust_player(player, ItemStack(output):get_count()*times*2, "crafting")
         end
         -- Tool wear for required_items
         print("output: ", output)
