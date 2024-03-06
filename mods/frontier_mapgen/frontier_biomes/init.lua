@@ -11,8 +11,5 @@ dofile(mp .. "/biomes.lua")
 dofile(mp .. "/ores.lua")
 dofile(mp .. "/grasses.lua")
 dofile(mp .. "/decorations.lua")
+dofile(mp .. "/abms.lua")
 
---dofile(mp .. "/swamp.lua")
---dofile(mp .. "/pine_savanna.lua")
-
---dofile(mp .. "/deciduous.lua")

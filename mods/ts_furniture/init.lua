@@ -9,16 +9,16 @@ minetest.register_globalstep(function(dtime)
 	local players = minetest.get_connected_players()
 	for i = 1, #players do
 		local name = players[i]:get_player_name()
-		if default.player_attached[name] and not players[i]:get_attach() and
-				(players[i]:get_player_control().up == true or
-						players[i]:get_player_control().down == true or
-						players[i]:get_player_control().left == true or
-						players[i]:get_player_control().right == true or
-						players[i]:get_player_control().jump == true) then
+		if player_api.player_attached[name] and not players[i]:get_attach() and
+		(players[i]:get_player_control().up == true or
+		players[i]:get_player_control().down == true or
+		players[i]:get_player_control().left == true or
+		players[i]:get_player_control().right == true or
+		players[i]:get_player_control().jump == true) then
 			players[i]:set_eye_offset({ x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
 			players[i]:set_physics_override(1, 1, 1)
-			default.player_attached[name] = false
-			default.player_set_animation(players[i], "stand", 30)
+			player_api.player_attached[name] = false
+			player_api.set_animation(players[i], "stand", 30)
 		end
 	end
 end)
@@ -26,17 +26,17 @@ end)
 
 ts_furniture.sit = function(name, pos)
 	local player = minetest.get_player_by_name(name)
-	if default.player_attached[name] then
+	if player_api.player_attached[name] then
 		player:set_eye_offset({ x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
-		player:set_physics_override(1, 1, 1)
-		default.player_attached[name] = false
-		default.player_set_animation(player, "stand", 30)
+		player:set_physics_override({speed=1, jump=1, gravity=1})
+		player_api.player_attached[name] = false
+		player_api.set_animation(player, "stand", 30)
 	else
-		player:moveto(pos)
+		player:move_to(pos)
 		player:set_eye_offset({ x = 0, y = -5, z = 2 }, { x = 0, y = 0, z = 0 })
-		player:set_physics_override(0, 0, 0)
-		default.player_attached[name] = true
-		default.player_set_animation(player, "sit", 30)
+		player:set_physics_override({speed=0, jump=0, gravity=0})
+		player_api.player_attached[name] = true
+		player_api.set_animation(player, "sit", 30)
 	end
 end
 -- end of cozy-code
@@ -69,11 +69,11 @@ local furnitures = {
 	["table"] = {
 		description = "Table",
 		nodebox = {
-			{ -0.4, -0.5, -0.4, -0.3, 0.4, -0.3 }, -- foot 1
-			{ 0.3, -0.5, -0.4, 0.4, 0.4, -0.3 }, -- foot 2
-			{ -0.4, -0.5, 0.3, -0.3, 0.4, 0.4 }, -- foot 3
-			{ 0.3, -0.5, 0.3, 0.4, 0.4, 0.4 }, -- foot 4
-			{ -0.5, 0.4, -0.5, 0.5, 0.5, 0.5 }, -- table top
+			{ -0.4375, -0.5, -0.4375, -0.3, 0.375, -0.3 }, -- foot 1
+			{ 0.3, -0.5, -0.4375, 0.4375, 0.375, -0.3 }, -- foot 2
+			{ -0.4375, -0.5, 0.3, -0.3, 0.375, 0.4375 }, -- foot 3
+			{ 0.3, -0.5, 0.3, 0.4375, 0.375, 0.4375 }, -- foot 4
+			{ -0.5, 0.375, -0.5, 0.5, 0.5, 0.5 }, -- table top
 		},
 		craft = function(recipe)
 			return {
@@ -88,7 +88,7 @@ local furnitures = {
 		description = "Bench",
 		sitting = true,
 		nodebox = {
-			{ -0.5, -0.1, 0, 0.5, 0, 0.5 }, -- seating
+			{ -0.5, -0.125, 0, 0.5, 0, 0.5 }, -- seating
 			{ -0.4, -0.5, 0, -0.3, -0.1, 0.5 }, -- foot 1
 			{ 0.3, -0.5, 0, 0.4, -0.1, 0.5 }, -- foot 2
 		},
@@ -113,7 +113,7 @@ local furnitures = {
 			{ -1/2, 1/4, 7/16, 1/2, 5/16, 3/8},
 			{-1/2, -3/16, 7/16, 1/2, -1/4, 3/8},
 		},
-		groups = {choppy = 3, oddly_breakable_by_hand = 3, flammable = 2},
+		groups = {choppy=3, oddly_breakable_by_hand = 3, dig_immediate=2, flammable = 2},
 		craft = function(recipe)
 			return {
 				{ "group:stick", "", "group:stick"},
@@ -146,7 +146,7 @@ local furnitures = {
 			{1/2, 7/16, 1/2, 7/16, -1/2, -3/8},
 			{-1/2, 7/16, 1/2, -7/16, -1/2, -3/8},
 			{-7/16, 7/16, 7/16, 7/16, -1/2, 1/2},
-			{-1/16, 7/16, -3/8, 1/16, -3/8, -5/16},  
+			{-1/16, 7/16, -3/8, 1/16, -3/8, -5/16},
 		--	Doors
 			{3/8, 3/8, -6/16, 7/16, -3/8, -12/16},
 			{-3/8, 3/8, -6/16, -7/16, -3/8, -12/16},
@@ -221,23 +221,24 @@ function ts_furniture.register_furniture(recipe, description, texture)
 				if minetest.is_protected(pos, name) == true then
 					return
 				end
-				local formspec = 
-					"size[".. tostring(4+rows) .. ",9]" ..
+				local formspec = "size[".. tostring(4+rows) .. ",9]" ..
 					"list[nodemeta:"..pos.x..","..pos.y..","..pos.z .. ";main;0,0;8,".. tostring(rows) ..";]"..
+					"field_close_on_enter[furniture_close;true]" ..
 					"list[current_player;main;0,"..tostring(rows + 1) ..";8,4;]"..
 					"listring[]"
 				if state.name == node_name:gsub("_open","_closed") then
+					minetest.sound_play({name="doors_door_open", gain=0.4, pitch=1.5})
 					minetest.swap_node(pos, {name = node_name:gsub("_closed", "_open"), param2 = state.param2})
-					minetest.show_formspec(name, "furniture_"..minetest.pos_to_string(pos), formspec)
+					minetest.show_formspec(name, "furniture:"..minetest.pos_to_string(pos), formspec)
 				else
+					minetest.sound_play({name="doors_door_close", gain=0.4, pitch=2})
 					minetest.swap_node(pos, {name = node_name:gsub("_open", "_closed"), param2 = state.param2})
-
-					--minetest.show_formspec(name, "furniture_"..minetest.pos_to_string(pos), formspec)
 				end
 			end
+
 		end
 		
-		local node_def = {}	
+		local node_def = {}
 		node_def.description = description .. " " .. def.description
 		node_def.drawtype = "nodebox"
 		node_def.climbable = def.climbable or nil
@@ -246,11 +247,12 @@ function ts_furniture.register_furniture(recipe, description, texture)
 		node_def.sunlight_propagates = true
 		node_def.tiles = { texture }
 		node_def.groups = groups
+		node_def.sounds = default.node_sound_wood_defaults()
 		node_def.node_box = {
 			type = "fixed",
 			fixed = def.nodebox
 		}
-		if def.on_construct then 
+		if def.on_construct then
 			node_def.on_construct = def.on_construct
 		end
 
@@ -281,10 +283,12 @@ function ts_furniture.register_furniture(recipe, description, texture)
 		end
 
 
-		minetest.register_craft({
-			output = node_name,
-			recipe = def.craft(recipe)
-		})
+		-- minetest.register_craft({
+		-- 	output = node_name,
+		-- 	recipe = def.craft(recipe)
+		-- })
+
+		frontier_craft.register_craft("hand", node_name, {inputs={recipe .. " 2"}, required_item="frontier_tools:forge_hammer"})
 
 		if def.burntime then
 			minetest.register_craft({
@@ -303,3 +307,16 @@ ts_furniture.register_furniture("frontier_trees:cypress_wood", "Cypress", "front
 ts_furniture.register_furniture("frontier_trees:mesquite_wood", "Mesquite", "frontier_trees_mesquite_wood.png")
 ts_furniture.register_furniture("frontier_trees:poplar_wood", "Poplar", "frontier_trees_poplar_wood.png")
 
+-- Handle closing cabinets after use
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+	if string.match(formname, "furniture:") then
+		local pos = minetest.string_to_pos(formname:gsub("furniture:", ""))
+		if pos and fields.quit then
+			minetest.after(0.25, function()
+				local node = minetest.get_node(pos)
+				minetest.sound_play({name="doors_door_close", gain=0.4, pitch=2})
+				minetest.swap_node(pos, {name = node.name:gsub("_open", "_closed"), param2=node.param2})
+			end)
+		end
+	end
+end)

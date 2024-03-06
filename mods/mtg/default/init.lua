@@ -11,9 +11,9 @@ default.LIGHT_MAX = 14
 -- GUI related stuff
 minetest.register_on_joinplayer(function(player)
 	player:set_formspec_prepend([[
-			bgcolor[#080808BB;true]
-			background[5,5;1,1;gui_formbg.png;true]
-			listcolors[#00000069;#5A5A5A;#141318;#30434C;#FFF] ]])
+			bgcolor[#332010DD]
+			background[5,5;1,1;gui_formbg_light.png;true]
+			listcolors[#00000099;#555;#201318;#60434C;#FF0] ]])
 end)
 
 function default.get_hotbar_bg(x,y)

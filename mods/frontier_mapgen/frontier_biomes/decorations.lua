@@ -1,6 +1,10 @@
 -- All mapgens except mgv6
 
+
+
 function biomes.register_decorations()
+	
+	-- Dry dirt in savanna
 	minetest.register_decoration({
 		deco_type = "simple",
 		place_on = {"default:dry_dirt_with_dry_grass"},
@@ -17,6 +21,29 @@ function biomes.register_decorations()
 		y_max = 31000,
 		y_min = 1,
 		decoration = "default:dry_dirt",
+		place_offset_y = -1,
+		flags = "force_placement",
+	})
+
+	-- Swamp water
+
+	minetest.register_decoration({
+		deco_type = "simple",
+		place_on = {"default:water_source"},
+		sidelen = 16,
+		noise_params = {
+			offset = 0,
+			scale = -1.5,
+			spread = {x = 12, y = 12, z = 12},
+			seed = 76,
+			octaves = 2,
+			persist = 1.0
+		},
+		biomes = {"savanna"},
+		y_max = 1,
+		y_min = -1,
+		decoration = "frontier_biomes:swamp_water_source",
+		neighbors = {"group:soil"},
 		place_offset_y = -1,
 		flags = "force_placement",
 	})
@@ -260,7 +287,6 @@ function biomes.register_decorations()
 		biomes = {
 			"desert_ocean",
 			"savanna_ocean",
-			"swamp_ocean",
 		},
 		y_max = -2,
 		y_min = -8,

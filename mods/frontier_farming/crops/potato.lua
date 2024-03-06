@@ -17,15 +17,14 @@ minetest.register_node("crops:potato_eyes", {
 	description = S("Potato eyes"),
 	inventory_image = "crops_potato_eyes.png",
 	wield_image = "crops_potato_eyes.png",
-	tiles = { "crops_potato_plant_1.png" },
-	drawtype = "plantlike",
-	paramtype2 = "meshoptions",
+	tiles = { "crops_potato_eyes.png" },
+	drawtype = "signlike",
+	paramtype2 = "wallmounted",
 	waving = 1,
 	sunlight_propagates = false,
 	use_texture_alpha = true,
 	walkable = false,
 	paramtype = "light",
-	node_placement_prediction = "crops:potato_plant_1",
 	groups = { snappy=3,flammable=3,flora=1,attached_node=1 },
 	selection_box = {
 		type = "fixed",
@@ -37,45 +36,58 @@ minetest.register_node("crops:potato_eyes", {
 		if minetest.get_item_group(under.name, "soil") <= 1 then
 			return
 		end
-		crops.plant(pointed_thing.above, {name="crops:potato_plant_1", param2 = 3})
+		crops.plant(pointed_thing.above, {name="crops:potato_eyes", param2 = 1})
+
 		if not minetest.settings:get_bool("creative_mode") then
 			itemstack:take_item()
 		end
 		return itemstack
-	end
+	end,
 })
 
 for stage = 1, 5 do
-minetest.register_node("crops:potato_plant_" .. stage , {
-	description = S("Potato plant"),
-	tiles = { "crops_potato_plant_" .. stage .. ".png" },
-	drawtype = "plantlike",
-	paramtype2 = "meshoptions",
-	waving = 1,
-	sunlight_propagates = true,
-	use_texture_alpha = true,
-	walkable = false,
-	paramtype = "light",
-	groups = { snappy=3, flammable=3, flora=1, attached_node=1, not_in_creative_inventory=1 },
-	drop = {},
-	sounds = default.node_sound_leaves_defaults(),
-	selection_box = {
-		type = "fixed",
-		fixed = {-0.45, -0.5, -0.45,  0.45, -0.6 + (((math.min(stage, 4)) + 1) / 5), 0.45}
-	}
-})
+	minetest.register_node("crops:potato_plant_" .. stage , {
+		description = S("Potato plant"),
+		tiles = { "crops_potato_plant_" .. stage .. ".png" },
+		drawtype = "plantlike",
+		paramtype2 = "meshoptions",
+		waving = 1,
+		sunlight_propagates = true,
+		use_texture_alpha = true,
+		walkable = false,
+		paramtype = "light",
+		groups = { snappy=3, flammable=3, flora=1, attached_node=1, not_in_creative_inventory=1 },
+		drop = {},
+		sounds = default.node_sound_leaves_defaults(),
+		selection_box = {
+			type = "fixed",
+			fixed = crops.selection_boxes.base
+		}
+	})
 end
 
-minetest.register_craftitem("crops:potato", {
+-- minetest.register_craftitem("crops:potato", {
+-- 	description = S("Potato"),
+-- 	inventory_image = "crops_potato.png",
+-- 	on_use = minetest.item_eat(1)
+-- })
+
+
+minetest.register_node("crops:potato", {
+    drawtype = "plantlike",
+    tiles = {"crops_potato.png"},
+    visual_scale= 0.5,
 	description = S("Potato"),
 	inventory_image = "crops_potato.png",
-	on_use = minetest.item_eat(1)
-})
-
-minetest.register_craft({
-	type = "shapeless",
-	output = "crops:potato_eyes",
-	recipe = { "crops:potato" }
+    paramtype = "light",
+	sunlight_propagates = true,
+	walkable = false,
+    selection_box = {
+        type = "fixed",
+        fixed = {-3 / 16, -7 / 16, -3 / 16, 3 / 16, 4 / 16, 3 / 16},
+    },
+	on_use = minetest.item_eat(1, "crops:potato_eyes"),
+    groups = {fleshy=3, snappy=3, dig_immediate=3, food_tomato=1}
 })
 
 --
@@ -119,46 +131,70 @@ minetest.register_node("crops:soil_with_potatoes", {
 --
 -- grows a plant to mature size
 --
-minetest.register_abm({
-	nodenames = { "crops:potato_plant_1", "crops:potato_plant_2", "crops:potato_plant_3" },
-	neighbors = { "group:soil" },
-	interval = crops.settings.interval,
-	chance = crops.settings.chance,
-	action = function(pos, node, active_object_count, active_object_count_wider)
-		if not crops.can_grow(pos) then
-			return
-		end
-		local below = { x = pos.x, y = pos.y - 1, z = pos.z }
-		if not minetest.registered_nodes[minetest.get_node(below).name].groups.soil then
-			return
-		end
-		local meta = minetest.get_meta(pos)
-		local damage = meta:get_int("crops_damage")
-		if damage == 100 then
-			crops.die(pos)
-			return
-		end
-		local n = string.gsub(node.name, "3", "4")
-		n = string.gsub(n, "2", "3")
-		n = string.gsub(n, "1", "2")
-		minetest.swap_node(pos, { name = n, param2 = 3 })
-	end
-})
+-- minetest.register_abm({
+-- 	nodenames = { "crops:potato_plant_1", "crops:potato_plant_2", "crops:potato_plant_3" },
+-- 	neighbors = { "group:soil" },
+-- 	interval = crops.settings.interval,
+-- 	chance = crops.settings.chance,
+-- 	action = function(pos, node, active_object_count, active_object_count_wider)
+-- 		if not crops.can_grow(pos) then
+-- 			return
+-- 		end
+-- 		local below = { x = pos.x, y = pos.y - 1, z = pos.z }
+-- 		if not minetest.registered_nodes[minetest.get_node(below).name].groups.soil then
+-- 			return
+-- 		end
+-- 		local meta = minetest.get_meta(pos)
+-- 		local damage = meta:get_int("crops_damage")
+-- 		if damage == 100 then
+-- 			crops.die(pos)
+-- 			return
+-- 		end
+-- 		local n = string.gsub(node.name, "3", "4")
+-- 		n = string.gsub(n, "2", "3")
+-- 		n = string.gsub(n, "1", "2")
+-- 		minetest.swap_node(pos, { name = n, param2 = 3 })
+-- 	end
+-- })
 
---
--- grows the final potatoes in the soil beneath
---
-minetest.register_abm({
-	nodenames = { "crops:potato_plant_4" },
-	neighbors = { "group:soil" },
-	interval = crops.settings.interval,
-	chance = crops.settings.chance,
-	action = function(pos, node, active_object_count, active_object_count_wider)
-		if not crops.can_grow(pos) then
+-- --
+-- -- grows the final potatoes in the soil beneath
+-- --
+-- minetest.register_abm({
+-- 	nodenames = { "crops:potato_plant_4" },
+-- 	neighbors = { "group:soil" },
+-- 	interval = crops.settings.interval,
+-- 	chance = crops.settings.chance,
+-- 	action = function(pos, node, active_object_count, active_object_count_wider)
+-- 		if not crops.can_grow(pos) then
+-- 			return
+-- 		end
+-- 		local below = { x = pos.x, y = pos.y - 1, z = pos.z }
+-- 		if not minetest.registered_nodes[minetest.get_node(below).name].groups.soil then
+-- 			return
+-- 		end
+-- 		local meta = minetest.get_meta(pos)
+-- 		local damage = meta:get_int("crops_damage")
+-- 		minetest.set_node(below, { name = "crops:soil_with_potatoes" })
+-- 		meta = minetest.get_meta(below)
+-- 		meta:set_int("crops_damage", damage)
+-- 	end
+-- })
+
+crops.potato_grow = function(pos)
+	local node = minetest.get_node(pos)
+	local meta = minetest.get_meta(pos)
+	local damage = meta:get_int("crops_damage")
+	if damage == 100 then
+		crops.die(pos)
+		return
+	end
+	local n = node.name
+	if n == "crops:potato_plant_4" then
+		local below = {x=pos.x, y=pos.y-1, z=pos.z}
+		if minetest.get_node(below) == "crops:soil_with_potatoes" then
 			return
-		end
-		local below = { x = pos.x, y = pos.y - 1, z = pos.z }
-		if not minetest.registered_nodes[minetest.get_node(below).name].groups.soil then
+		elseif not minetest.registered_nodes[minetest.get_node(below).name].groups.soil then
 			return
 		end
 		local meta = minetest.get_meta(pos)
@@ -166,8 +202,16 @@ minetest.register_abm({
 		minetest.set_node(below, { name = "crops:soil_with_potatoes" })
 		meta = minetest.get_meta(below)
 		meta:set_int("crops_damage", damage)
+		return
 	end
-})
+	n = string.gsub(node.name, "3", "4")
+	n = string.gsub(n, "2", "3")
+	n = string.gsub(n, "1", "2")
+	if n == "crops:potato_eyes" then
+		n = "crops:potato_plant_1"
+	end
+	minetest.swap_node(pos, { name = n, param2 = 3 })
+end
 
 crops.potato_die = function(pos)
 	minetest.set_node(pos, { name = "crops:potato_plant_5", param2 = 3 })
@@ -181,15 +225,20 @@ end
 
 local properties = {
 	die = crops.potato_die,
-	waterstart = 30,
-	wateruse = 1,
+	grow = crops.potato_grow,
+	waterstart = 15,
+	wateruse = 2,
 	night = 5,
-	soak = 80,
-	soak_damage = 90,
+	soak = 75,
+	soak_damage = 85,
 	wither = 20,
 	wither_damage = 10,
+	cold = 38,
+    cold_damage = 28,
+    time_to_grow = 1400
 }
 
+crops.register({ name = "crops:potato_eyes", properties = properties })
 crops.register({ name = "crops:potato_plant_1", properties = properties })
 crops.register({ name = "crops:potato_plant_2", properties = properties })
 crops.register({ name = "crops:potato_plant_3", properties = properties })

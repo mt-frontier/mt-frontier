@@ -22,7 +22,7 @@ function biomes.register_ores()
 			octaves = 1,
 		},
 		stratum_thickness = 4,
-		biomes = {"cold_desert"},
+		--biomes = {"cold_desert"},
 	})
 
 	minetest.register_ore({
@@ -40,7 +40,7 @@ function biomes.register_ores()
 			octaves = 1,
 		},
 		stratum_thickness = 2,
-		biomes = {"cold_desert"},
+		--biomes = {"cold_desert"},
 	})
 
 	-- Desert sandstone

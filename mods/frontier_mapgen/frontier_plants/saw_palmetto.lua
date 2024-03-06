@@ -36,3 +36,5 @@ minetest.register_decoration({
 	decoration = "frontier_plants:saw_palmetto",
 	param2 = 2
 })
+
+frontier_craft.register_craft("hand", "farming:string", {inputs={"frontier_plants:saw_palmetto"}})

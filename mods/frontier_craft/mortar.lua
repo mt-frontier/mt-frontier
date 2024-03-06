@@ -112,7 +112,7 @@ minetest.register_node("frontier_craft:mortar", {
 		end
 	end,
 	node_box = {
-		type = "fixed",	
+		type = "fixed",
 		fixed = {
 --base
 			{-0.1875, -0.5, -0.1875, 0.1875, -0.4326, 0.1875,}, 
@@ -128,7 +128,7 @@ minetest.register_node("frontier_craft:mortar", {
 			{-0.25, -0.3075, -0.1875, -0.1875, -0.1875, 0.1875},
 			{-0.1875, -0.3075, 0.25, 0.1875, -0.1875, 0.1875},
 			{0.25, -0.3075, 0.1875, 0.1875, -0.1875, -0.1875},
-    
+
 --Pestle
 			{0, -0.375,  0, 0.09375, 0, 0.09375,},
 		}

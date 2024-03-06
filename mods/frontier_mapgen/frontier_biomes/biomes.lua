@@ -202,10 +202,9 @@ function biomes.register_biomes(upper_limit)
 		depth_riverbed = 2,
 		y_max = upper_limit,
 		y_min = 4,
-		heat_point = 45,
+		heat_point = 40,
 		humidity_point = 70,
 	})
-
 
 	minetest.register_biome({
 		name = "coniferous_forest_ocean",
@@ -217,7 +216,7 @@ function biomes.register_biomes(upper_limit)
 		depth_riverbed = 2,
 		y_max = 3,
 		y_min = -112,
-		heat_point = 45,
+		heat_point = 40,
 		humidity_point = 70,
 	})
 
@@ -234,7 +233,7 @@ function biomes.register_biomes(upper_limit)
 		y_max = upper_limit,
 		y_min = 1,
 		heat_point = 60,
-		humidity_point = 68,
+		humidity_point = 72,
 	})
 
 	minetest.register_biome({
@@ -248,7 +247,7 @@ function biomes.register_biomes(upper_limit)
 		y_max = 0,
 		y_min = -1,
 		heat_point = 60,
-		humidity_point = 68,
+		humidity_point = 72,
 	})
 
 	minetest.register_biome({
@@ -263,7 +262,7 @@ function biomes.register_biomes(upper_limit)
 		y_max = -2,
 		y_min = -112,
 		heat_point = 60,
-		humidity_point = 68,
+		humidity_point = 72,
 	})
 
 	-- Desert
@@ -279,7 +278,7 @@ function biomes.register_biomes(upper_limit)
 		depth_riverbed = 2,
 		y_max = upper_limit,
 		y_min = 4,
-		heat_point = 92,
+		heat_point = 99,
 		humidity_point = 16,
 	})
 
@@ -295,72 +294,72 @@ function biomes.register_biomes(upper_limit)
 		vertical_blend = 1,
 		y_max = 3,
 		y_min = -112,
-		heat_point = 92,
+		heat_point = 99,
 		humidity_point = 16,
 	})
 
 	-- Sandstone desert
 
-	minetest.register_biome({
-		name = "sandstone_desert",
-		node_top = "default:sand",
-		depth_top = 1,
-		node_filler = "default:sand",
-		depth_filler = 1,
-		node_stone = "default:sandstone",
-		node_riverbed = "default:sand",
-		depth_riverbed = 2,
-		y_max = upper_limit,
-		y_min = 4,
-		heat_point = 60,
-		humidity_point = 0,
-	})
+	-- minetest.register_biome({
+	-- 	name = "sandstone_desert",
+	-- 	node_top = "default:sand",
+	-- 	depth_top = 1,
+	-- 	node_filler = "default:sand",
+	-- 	depth_filler = 1,
+	-- 	node_stone = "default:sandstone",
+	-- 	node_riverbed = "default:sand",
+	-- 	depth_riverbed = 2,
+	-- 	y_max = upper_limit,
+	-- 	y_min = 4,
+	-- 	heat_point = 60,
+	-- 	humidity_point = 0,
+	-- })
 
-	minetest.register_biome({
-		name = "sandstone_desert_ocean",
-		node_top = "default:sand",
-		depth_top = 1,
-		node_filler = "default:sand",
-		depth_filler = 3,
-		node_stone = "default:sandstone",
-		node_riverbed = "default:sand",
-		depth_riverbed = 2,
-		y_max = 3,
-		y_min = -112,
-		heat_point = 60,
-		humidity_point = 0,
-	})
+	-- minetest.register_biome({
+	-- 	name = "sandstone_desert_ocean",
+	-- 	node_top = "default:sand",
+	-- 	depth_top = 1,
+	-- 	node_filler = "default:sand",
+	-- 	depth_filler = 3,
+	-- 	node_stone = "default:sandstone",
+	-- 	node_riverbed = "default:sand",
+	-- 	depth_riverbed = 2,
+	-- 	y_max = 3,
+	-- 	y_min = -112,
+	-- 	heat_point = 60,
+	-- 	humidity_point = 0,
+	-- })
 	
-	-- Cold desert
+	-- -- Cold desert
 
-	minetest.register_biome({
-		name = "cold_desert",
-		node_top = "default:silver_sand",
-		depth_top = 1,
-		node_filler = "default:silver_sand",
-		depth_filler = 1,
-		node_riverbed = "default:sand",
-		depth_riverbed = 2,
-		y_max = upper_limit,
-		y_min = 4,
-		heat_point = 40,
-		humidity_point = 0,
-	})
+	-- minetest.register_biome({
+	-- 	name = "cold_desert",
+	-- 	node_top = "default:silver_sand",
+	-- 	depth_top = 1,
+	-- 	node_filler = "default:silver_sand",
+	-- 	depth_filler = 1,
+	-- 	node_riverbed = "default:sand",
+	-- 	depth_riverbed = 2,
+	-- 	y_max = upper_limit,
+	-- 	y_min = 4,
+	-- 	heat_point = 40,
+	-- 	humidity_point = 0,
+	-- })
 
-	minetest.register_biome({
-		name = "cold_desert_ocean",
-		node_top = "default:sand",
-		depth_top = 1,
-		node_filler = "default:sand",
-		depth_filler = 3,
-		node_riverbed = "default:sand",
-		depth_riverbed = 2,
-		vertical_blend = 1,
-		y_max = 3,
-		y_min = -112,
-		heat_point = 40,
-		humidity_point = 0,
-	})
+	-- minetest.register_biome({
+	-- 	name = "cold_desert_ocean",
+	-- 	node_top = "default:sand",
+	-- 	depth_top = 1,
+	-- 	node_filler = "default:sand",
+	-- 	depth_filler = 3,
+	-- 	node_riverbed = "default:sand",
+	-- 	depth_riverbed = 2,
+	-- 	vertical_blend = 1,
+	-- 	y_max = 3,
+	-- 	y_min = -112,
+	-- 	heat_point = 40,
+	-- 	humidity_point = 0,
+	-- })
 
 	-- Savanna
 
@@ -368,14 +367,14 @@ function biomes.register_biomes(upper_limit)
 		name = "savanna",
 		node_top = "default:dry_dirt_with_dry_grass",
 		depth_top = 1,
-		node_filler = "default:dirt",
+		node_filler = "default:dry_dirt",
 		depth_filler = 1,
 		node_riverbed = "default:sand",
 		depth_riverbed = 2,
 		y_max = upper_limit,
 		y_min = 1,
 		heat_point = 89,
-		humidity_point = 42,
+		humidity_point = 30,
 	})
 
 	minetest.register_biome({
@@ -389,7 +388,7 @@ function biomes.register_biomes(upper_limit)
 		y_max = 0,
 		y_min = -1,
 		heat_point = 89,
-		humidity_point = 42,
+		humidity_point = 30,
 	})
 
 	minetest.register_biome({
@@ -404,7 +403,7 @@ function biomes.register_biomes(upper_limit)
 		y_max = -2,
 		y_min = -112,
 		heat_point = 89,
-		humidity_point = 42,
+		humidity_point = 30,
 	})
 
    -- Pine Savanna
@@ -422,21 +421,36 @@ function biomes.register_biomes(upper_limit)
         y_min = 1,
         vertical_blend = 2,
         heat_point = 80,
-        humidity_point = 60,
+        humidity_point = 40,
     })
     
-    minetest.register_biome ({
-        name = "pine_savanna_shore",
-        node_top = "default:dirt",
-        depth_top = 1,
-        node_filler = "default_dirt",
-        depth_filler = 3,
-        node_water = "default:water_source",
-        y_max = 0,
-        y_min = -2,
-        heat_point = 80,
-        humidity_point = 60,
-    })
+    -- minetest.register_biome ({
+    --     name = "pine_savanna_shore",
+    --     node_top = "default:dirt",
+    --     depth_top = 1,
+    --     node_filler = "default_dirt",
+    --     depth_filler = 3,
+    --     node_water = "default:water_source",
+    --     y_max = 0,
+    --     y_min = -2,
+    --     heat_point = 80,
+    --     humidity_point = 60,
+    -- })
+
+	minetest.register_biome({
+		name = "pine_savanna_ocean",
+		node_top = "default:sand",
+		depth_top = 1,
+		node_filler = "default:sand",
+		depth_filler = 3,
+		node_riverbed = "default:sand",
+		depth_riverbed = 2,
+		y_max = 3,
+		y_min = -112,
+		heat_point = 80,
+		humidity_point = 40,
+	})
+
 
 -- Swamp Biome
 
@@ -463,7 +477,7 @@ function biomes.register_biomes(upper_limit)
         depth_filler = 3,
         node_riverbed = "default:sand",
         depth_riverbed = 2,
-        node_water_top = "frontier_biomes:swamp_water_source",
+        node_water = "default:water_source",
         y_max = 1,
         y_min = -1,
         heat_point = 86,

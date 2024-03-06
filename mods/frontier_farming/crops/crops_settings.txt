@@ -6,5 +6,5 @@
 -- the "easy" or "difficult" settings if you wish, or come up with your own values.
 --
 
--- Valid values are "easy", "normal", and "difficult"
-crops.difficulty = "normal"
+-- Valid values are "easy", "normal", "difficult", and "frontier"
+crops.difficulty = "frontier"

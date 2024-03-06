@@ -57,7 +57,20 @@ settings.difficult = {
 	damage_max = 100,
 	hydration = true,
 }
-
+settings.frontier = {
+	chance = 8,
+	interval = 31,
+	light = 13,
+	watercan = 25,
+	watercan_max = 100,
+	watercan_uses = 24,
+	damage_chance = 4,
+	damage_interval = 67,
+	damage_tick_min = 3,
+	damage_tick_max = 6,
+	damage_max = 100,
+	hydration = true,
+}
 
 local worldpath = minetest.get_worldpath()
 local modpath = minetest.get_modpath(minetest.get_current_modname())
@@ -65,7 +78,6 @@ local modpath = minetest.get_modpath(minetest.get_current_modname())
 -- Load support for intllib.
 local S, _ = dofile(modpath .. "/intllib.lua")
 crops.intllib = S
-
 
 dofile(modpath .. "/crops_settings.txt")
 
@@ -87,26 +99,26 @@ else
 end
 
 if not crops.difficulty then
-	crops.difficulty = "normal"
-	minetest.log("error", "[crops] "..S("Defaulting to \"normal\" difficulty settings"))
+	crops.difficulty = "frontier"
+	minetest.log("action", "[crops] "..S("Defaulting to \"frontier\" difficulty settings"))
 end
 crops.settings = settings[crops.difficulty]
 if not crops.settings then
-	minetest.log("error", "[crops] "..S("Defaulting to \"normal\" difficulty settings"))
-	crops.settings = settings.normal
+	minetest.log("action", "[crops] "..S("Defaulting to \"frontier\" difficulty settings"))
+	crops.settings = settings.frontier
 end
 if crops.settings.hydration then
 	minetest.log("action", "[crops] "..S("Hydration and dehydration mechanics are enabled."))
 end
 
-local find_plant = function(node)
+crops.find_plant = function(node)
 	for i = 1,table.getn(crops.plants) do
 		if crops.plants[i].name == node.name then
 			return crops.plants[i]
 		end
 	end
-	minetest.log("error", "[crops] "..S("Unable to find plant \"@1\" in crops table", node.name))
-	return nil
+	minetest.log("warning", "[crops] "..S("Unable to find plant \"@1\" in crops table", node.name))
+	return false
 end
 
 crops.register = function(plantdef)
@@ -116,42 +128,155 @@ end
 crops.plant = function(pos, node)
 	minetest.set_node(pos, node)
 	local meta = minetest.get_meta(pos)
-	local plant = find_plant(node)
+	local plant = crops.find_plant(node)
 	meta:set_int("crops_water", math.max(plant.properties.waterstart, 1))
 	meta:set_int("crops_damage", 0)
+	meta:set_int("crops_time_grew", minetest.get_gametime())
+	crops.update_infotext(pos, "Germinating")
 end
+
+-- Update crop infotext
+crops.update_infotext = function(pos, status)
+	local node = minetest.get_node(pos)
+	local plant = crops.find_plant(node)
+	if not plant and minetest.get_item_group(node.name, "flora") == 0 then
+		minetest.log("warning", "[crops] Failed to find crop to update infotext at ".. minetest.pos_to_string(pos), 0)
+		return
+	end
+	local meta = minetest.get_meta(pos)
+	local infotext = minetest.registered_nodes[node.name].description
+	if crops.settings.hydration and plant then
+		infotext = infotext .. "\nMoisture: " .. meta:get_int("crops_water")  .. "%"
+	end
+	local damage = meta:get_int("crops_damage")
+	if damage > 0 and plant then
+		infotext = infotext .. "\nDamage: " .. damage .. "%"
+	end
+	if meta:get_int("crops_time_grew") > 0 and plant then
+		local time_left = math.floor((plant.properties.time_to_grow - (minetest.get_gametime() - meta:get_int("crops_time_grew")))/60)
+		if time_left > 0 then
+			infotext = infotext .. "\nGrowing in: ~" .. time_left .. "'"
+		else
+			infotext = infotext .. "\nReady to grow"
+		end
+	end
+	if type(status) == "string" then
+		infotext = infotext .. "\n" .. status
+	end
+	meta:set_string("infotext", infotext)
+end
+
+-- Farming soil wet or dry depending on crops water level
+crops.update_soil_under_crop = function(crop_pos)
+	local plant = crops.find_plant(minetest.get_node(crop_pos))
+	if not plant then
+		return
+	end
+	local watered = minetest.get_meta(crop_pos):get_int("crops_water") > plant.properties.wither
+	local pos = {x=crop_pos.x, y=crop_pos.y-1, z=crop_pos.z}
+	local node = minetest.get_node(pos)
+    local n_def = minetest.registered_nodes[node.name] or nil
+	if n_def == nil then
+		return
+	elseif n_def.soil == nil then
+		return
+	end
+	local wet = n_def.soil.wet or nil
+	local base = n_def.soil.base or nil
+	local dry = n_def.soil.dry or nil
+	if not wet or not base or not dry then
+		return
+	end
+	if watered and node.name == dry then
+        minetest.set_node(pos, {name=wet})
+    elseif not watered and node.name == wet then
+		minetest.set_node(pos, {name=dry})
+	end
+end
+
+crops.selection_boxes = {
+	seed = {-0.4375, -0.5, -0.4375,  0.4375, -0.4375, 0.4375},
+	base = {-0.4375, -0.5, -0.4375,  0.4375, -0.25, 0.4375},
+	full = {-0.4375, -0.5, -0.4375,  0.4375, 0.5, 0.4375},
+	double = {-0.4375, -0.5, -0.4375,  0.4375, 1.5, 0.4375}
+}
 
 crops.can_grow = function(pos)
 	if minetest.get_node_light(pos) < crops.settings.light then
 		return false
 	end
 	local node = minetest.get_node(pos)
-	local plant = find_plant(node)
+	local plant = crops.find_plant(node)
 	if not plant then
 		return false
 	end
-	local meta = minetest.get_meta(pos)
-	if crops.settings.hydration then
-		local water = meta:get_int("crops_water")
-		if water < plant.properties.wither or water > plant.properties.soak then
+	crops.update_infotext(pos)
+	-- Crops reduced chance of growing when cold and do not grow when cold enough to cause damage
+	if temperature then
+		local temp = temperature.get_adjusted_temp(pos)
+		if temp < plant.properties.cold_damage then
+			crops.update_infotext(pos, "Freezing!")
+			return false
+		elseif temp < plant.properties.cold then
+			crops.update_infotext(pos, "Cold")
 			if math.random(0,1) == 0 then
 				return false
 			end
 		end
-		-- growing costs water!
-		meta:set_int("crops_water", math.max(1, water - 10))
+	end
+	local meta = minetest.get_meta(pos)
+	local time_grew = meta:get_int("crops_time_grew")
+	if time_grew > 0 then
+		local time_to_grow = plant.properties.time_to_grow
+		if time_to_grow then
+			if minetest.get_gametime() < time_to_grow + time_grew then
+				crops.update_infotext(pos)
+				return false
+			end
+		end
 	end
 
-	-- damaged plants are less likely to grow
+	if crops.settings.hydration then
+		local water = meta:get_int("crops_water")
+		crops.update_soil_under_crop(pos)
+		if water < plant.properties.wither_damage or water > plant.properties.soak_damage then
+			if math.random(0,100) > math.max(25, water) then
+				return false
+			end
+		elseif water < plant.properties.wither or water > plant.properties.soak then
+			if math.random(0,3) == 0 then
+				return false
+			end
+		end
+	end
+
 	local damage = meta:get_int("crops_damage")
 	if not damage == 0 then
 		if math.random(math.min(50, damage), 100) > 75 then
 			return false
 		end
 	end
-
 	-- allow the plant to grow
 	return true
+end
+
+crops.grow = function(pos)
+	local plant = crops.find_plant(minetest.get_node(pos))
+	if not plant then
+		return
+	end
+	if not plant.properties.grow then
+		return
+	end
+	plant.properties.grow(pos)
+	local meta = minetest.get_meta(pos)
+	meta:set_int("crops_time_grew", minetest.get_gametime())
+	-- growing costs water!
+	if crops.settings.hydration then
+		local water = meta:get_int("crops_water")
+		meta:set_int("crops_water", math.max(1, water - plant.properties.wateruse))
+	end
+	crops.update_infotext(pos)
 end
 
 crops.particles = function(pos, flag)
@@ -288,8 +413,9 @@ end
 crops.die = function(pos)
 	crops.particles(pos, 3)
 	local node = minetest.get_node(pos)
-	local plant = find_plant(node)
+	local plant = crops.find_plant(node)
 	plant.properties.die(pos)
+	crops.update_infotext(pos)
 	minetest.sound_play("crops_flies", {pos=pos, gain=0.8})
 end
 
@@ -304,82 +430,12 @@ dofile(modpath .. "/corn.lua")
 dofile(modpath .. "/tomato.lua")
 dofile(modpath .. "/potato.lua")
 dofile(modpath .. "/polebean.lua")
-
-local nodenames = {}
-for i = 1,table.getn(crops.plants) do
-	table.insert(nodenames, crops.plants[i].name)
-end
-
--- water handling code
-if crops.settings.hydration then
-	minetest.register_abm({
-		nodenames = nodenames,
-		interval = crops.settings.damage_interval,
-		chance = crops.settings.damage_chance,
-		action = function(pos, node, active_object_count, active_object_count_wider)
-			local meta = minetest.get_meta(pos)
-			local water = meta:get_int("crops_water")
-			local damage = meta:get_int("crops_damage")
-
-			-- get plant specific data
-			local plant = find_plant(node)
-			if plant == nil then
-				return
-			end
-
-			-- increase water for nearby water sources
-			local f = minetest.find_node_near(pos, 1, {"default:water_source", "default:water_flowing"})
-			if not f == nil then
-				water = math.min(100, water + 2)
-			else
-				f = minetest.find_node_near(pos, 2, {"default:water_source", "default:water_flowing"})
-				if not f == nil then
-					water = math.min(100, water + 1)
-				end
-			end
-
-			if minetest.get_node_light(pos, nil) < plant.properties.night then
-				-- compensate for light: at night give some water back to the plant
-				water = math.min(100, water + 1)
-			else
-				-- dry out the plant
-				water = math.max(1, water - plant.properties.wateruse)
-			end
-
-			meta:set_int("crops_water", water)
-
-			-- for convenience, copy water attribute to top half
-			if not plant.properties.doublesize == nil and plant.properties.doublesize then
-				local above = { x = pos.x, y = pos.y + 1, z = pos.z}
-				local abovemeta = minetest.get_meta(above)
-				abovemeta:set_int("crops_water", water)
-			end
-
-			if water <= plant.properties.wither_damage then
-				crops.particles(pos, 0)
-				damage = damage + math.random(crops.settings.damage_tick_min, crops.settings.damage_tick_max)
-			elseif water <= plant.properties.wither then
-				crops.particles(pos, 0)
-				return
-			elseif water >= plant.properties.soak_damage then
-				crops.particles(pos, 1)
-				damage = damage + math.random(crops.settings.damage_tick_min, crops.settings.damage_tick_max)
-			elseif water >= plant.properties.soak then
-				crops.particles(pos, 1)
-				return
-			end
-			meta:set_int("crops_damage", math.min(crops.settings.damage_max, damage))
-
-			-- is it dead?
-			if damage >= 100 then
-				crops.die(pos)
-			end
-		end
-	})
-end
+dofile(modpath .. "/cotton.lua")
+dofile(modpath .. "/sunflower.lua")
+dofile(modpath .. "/grains.lua")
 
 -- cooking recipes that mix craftitems
 dofile(modpath .. "/cooking.lua")
-dofile(modpath .. "/mapgen.lua")
+--dofile(modpath .. "/mapgen.lua")
 
 minetest.log("action", "[crops] "..S("Loaded!"))

@@ -27,6 +27,7 @@ minetest.register_node("frontier_trees:laurel_stem", {
 	wield_image = "frontier_trees_laurel_stem.png",
 	paramtype = "light",
 	sunlight_propagates = true,
+	drop = "default:stick 3",
 	groups = {choppy = 2, oddly_breakable_by_hand = 1, flammable = 2},
 	sounds = default.node_sound_wood_defaults(),
 	selection_box = {

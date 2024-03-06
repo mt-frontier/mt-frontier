@@ -9,7 +9,7 @@ local function add_waypoint_hud(player, pos)
 	local meta = player:get_meta()
 	meta:set_int("home_hud", id)
 end
-	
+
 minetest.register_on_joinplayer(function(player)
 	local meta = player:get_meta()
 	local pos_str = meta:get_string("home")
@@ -48,7 +48,7 @@ minetest.register_chatcommand("home", {
 			return minetest.chat_send_player(name, "You must first /sethome")
 		end
 		local hud = meta:get_int("home_hud")
-		if hud == 0 then 
+		if hud == 0 then
 			local pos = minetest.string_to_pos(pos_str)
 			add_waypoint_hud(player, pos)
 		else

@@ -21,10 +21,10 @@ minetest.register_node("frontier_trees:holly_leaves", {
 minetest.register_node("frontier_trees:holly_stem", {
 	description = "Holly Stem",
 	drawtype = "plantlike",
-	tiles = {"default_pine_bush_stem.png"},
+	tiles = {"frontier_trees_holly_stem.png"},
 	visual_scale = 1.2,
-	inventory_image = "default_pine_bush_stem.png",
-	wield_image = "default_pine_bush_stem.png",
+	inventory_image = "frontier_trees_holly_stem.png",
+	wield_image = "frontier_trees_holly_stem.png",
 	paramtype = "light",
 	sunlight_propagates = true,
 	groups = {choppy = 2, oddly_breakable_by_hand = 1, flammable = 2},

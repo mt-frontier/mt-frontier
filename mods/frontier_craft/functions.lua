@@ -1,7 +1,6 @@
 local craft_index = frontier_craft.craft_index
 
-local function index_craft_abc(craft_type, craft_output)
-    print("Craft index total: ", #craft_index[craft_type])
+local index_craft_abc = function(craft_type, craft_output)
     local pt1 = 1
     local pt2  = #craft_index[craft_type]
     -- Manually add first 2 values to simplify search loop 
@@ -19,7 +18,6 @@ local function index_craft_abc(craft_type, craft_output)
         return
     end
     --  Check if new value is lower or higher than current values in index 
-    print(craft_output, craft_index[craft_type][pt2])
     if craft_output < craft_index[craft_type][1] then
         table.insert(craft_index[craft_type], 1, craft_output)
         return
@@ -27,7 +25,7 @@ local function index_craft_abc(craft_type, craft_output)
         craft_index[craft_type][pt2 + 1] = craft_output
         return
     end
-    -- Use binary search to index crafts in alphabetic order on registration
+    -- index crafts in alphabetic order on registration
     while true do
         if pt2 - pt1 == 1 or pt1 == pt2 then
             if craft_output < craft_index[craft_type][pt2] and craft_output > craft_index[craft_type][pt1] then
@@ -48,46 +46,52 @@ local function index_craft_abc(craft_type, craft_output)
     end
 end
 
--- Craft Groups: Simple way to represent group:items as their own inventory items/node for GUI usage only.
-function frontier_craft.register_craft_group(group_name, group_type, group_texture, item_list)
-    local error_head = "[frontier_craft] Warning: Craft group registration failed. "
-    if frontier_craft.craft_groups[group_name] ~= nil then
-       return minetest.log(error_head .. "Group already exists")
-    end
+-- Register group:item as its own inventory items/node for GUI usage and stores lookup of items in group in '_craft_group'.
+frontier_craft.register_craft_group_item = function(group_name, group_texture, item_list)
     if type(item_list) ~= "table" then
-       return minetest.log(error_head .. "Invalid itemlist. Must be a list of items in a table")
+        minetest.log("[frontier_craft] Craft group item_list invalid. Must be a list of items in a table")
+        return false
     end
-    -- for _, item in ipairs(item_list) do
-    --     if minetest.registered_items[item] == nil then
-    --        minetest.log("[frontier_craft] Warning: Item, " .. item .. " is not a registered item")
-    --     end
-    -- end
-    -- --frontier_craft.craft_groups[group_name] = item_list
-
-    -- Register craft items for groups to display in craft guide only.
-
-    local item_name = ":group:" .. group_name
+    local item_name = ":group:"..group_name
     local item_def = {}
     item_def.groups = {not_in_creative_inventory = 1, craft_group = 1}
     item_def.description = "Group ".. group_name
     item_def._craft_group = item_list
-    if group_type ~= "node" then
+    if type(group_texture) == "string" then
         item_def.inventory_image = group_texture
         minetest.register_craftitem(item_name, item_def)
-        return
-    else
-        item_def.groups["oddly_breakable_by_hand"] = 3
-        item_def.tiles = {group_texture}
+    elseif type(group_texture) == "table" then
+        item_def.groups["dig_immediate"] = 3
+        item_def.drop = ""
+        item_def.tiles = group_texture
         minetest.register_node(item_name, item_def)
+    else
+        minetest.log("warning", "[frontier_craft] No texture forund for craft group ".. group_name .. ". Group not registered")
+        return false
     end
+    return true
+end
+
+-- Add to list of craft groups
+function frontier_craft.register_craft_group(group_name)
+    local error_head = "[frontier_craft] Ignoring craft group "
+    if frontier_craft.craft_groups[group_name] ~= nil then
+        minetest.log("warning", error_head .. group_name .. ". group already exists")
+        return false
+    end
+    -- Register craft items for groups to display in craft guide and item lookup only.
+    frontier_craft.craft_groups[group_name] = {}
+    minetest.log("action", "[frontier_craft] Registered craft group: " .. group_name)
+    return true
 end
 
 function frontier_craft.register_craft(craft_type, output, craft_definition)
     local error_head = "[frontier_craft] Warning: Craft registration failed. "
-
+    assert(type(craft_definition) == "table", "Craft definition is missing or not a table")
     local inputs = craft_definition.inputs
     local replacements = craft_definition.replacements
-    local craft_type = craft_type or "hand"
+    local required_item = craft_definition.required_item
+    craft_type = craft_type or "hand"
 
     if frontier_craft.craft_types[craft_type] == nil then
 		craft_type = "hand"
@@ -125,19 +129,20 @@ function frontier_craft.register_craft(craft_type, output, craft_definition)
     -- Add crafts
     frontier_craft.registered_crafts[craft_type][output] = craft_definition
     index_craft_abc(craft_type, output)
-    print("Registered craft: "..output)
+    -- Support group:item crafting
+    local craft_items = table.copy(inputs)
+    if required_item ~= nil then
+        table.insert(craft_items, required_item)
+    end
+    for i, input in ipairs(craft_items) do
+        if string.match(input, "group:") then
+            local group_name = ItemStack(input):get_name():gsub("group:", "")
+            frontier_craft.register_craft_group(group_name)
+        end
+    end
 end
 
--- function frontier_craft.item_is_in_craft_group(itemname, group)
---     assert(frontier_craft.craft_groups[group] ~= nil, "Invalid Group, " .. group)
---     for _, item_name in ipairs(frontier_craft.craft_groups[group]) do
---         if item_name == itemname then
---             return true
---         end
---         return false
---     end
--- end
-
+-- Check for items in player main inventory
 local function seek_player_stack(inv, stack)
     -- Returns first matching stack from inv that contains stack
     if inv:contains_item("main", stack) then
@@ -153,8 +158,9 @@ local function seek_player_stack(inv, stack)
         return false
     end
 end
-
-local function seek_player_item_group(inv, group_items, count)
+-- Check if there is <count> number of any of list <group_items> in players inventory 
+-- Returns stack from players inventory or false.
+local seek_player_item_group = function(inv, group_items, count)
     for i = 1, inv:get_size("main") do
         local stack = inv:get_stack("main", i)
         for _, craft_item in ipairs(group_items) do
@@ -166,24 +172,7 @@ local function seek_player_item_group(inv, group_items, count)
     return false
 end
 
-function frontier_craft.wear_player_tool(inv, tool_name, times)
-    local times = times or 1
-    for i, player_tool in ipairs(inv:get_list("main")) do
-        if player_tool:get_name() == tool_name then
-            local uses = player_tool:get_tool_capabilities().uses
-            if uses ~= nil then
-                player_tool:add_wear( 65535/(uses-times))
-            else
-                player_tool:add_wear(1000*times)
-            end
-            inv:set_stack("main", i, player_tool)
-            minetest.sound_play({name = "default_wood_footstep", gain = 1.0})
-            return
-        end
-    end
-end
-
-function frontier_craft.player_has_item_or_group(player, itemstring)
+frontier_craft.player_has_item_or_group = function(player, itemstring)
     local inv = minetest.get_inventory({type = "player", name = player:get_player_name()})
     local itemstack = ItemStack(itemstring)
     local group_items = itemstack:get_definition()._craft_group
@@ -196,10 +185,8 @@ function frontier_craft.player_has_item_or_group(player, itemstring)
     end
 end
 
--- Take item by name or group
-
 -- Checks all conditions to see if a craft is possible. Returns false or possible to craft
-function frontier_craft.can_craft(player, craft_type, output, times)
+frontier_craft.can_craft = function(player, craft_type, output, times)
     local player_inv = minetest.get_inventory({type="player", name=player:get_player_name()})
     local output_stack = ItemStack(output)
 
@@ -213,8 +200,13 @@ function frontier_craft.can_craft(player, craft_type, output, times)
     if frontier_craft.registered_crafts[craft_type][output] == nil then
         return false
     end
+    -- Always true if player has creative priv 
+    local privs = minetest.get_player_privs(player:get_player_name())
+    if privs.creative then
+        return times
+    end
 
-    -- Caluclate number of time player can perform craft
+    -- Calculate number of time player can perform craft
     local inputs = frontier_craft.registered_crafts[craft_type][output]["inputs"]
     local replacements = frontier_craft.registered_crafts[craft_type][output]["replacements"]
     local required_item = frontier_craft.registered_crafts[craft_type][output]["required_item"]
@@ -225,8 +217,7 @@ function frontier_craft.can_craft(player, craft_type, output, times)
             return false
         end
     end
-
-    -- check first available matching stack and adjust times craft may be performed based on inventory.
+    -- Check first available matching stack and adjust times craft may be performed based on inventory.
     local player_inputs = {}
     for i, item in ipairs(inputs) do
         local item_stack = ItemStack(item)
@@ -253,13 +244,29 @@ function frontier_craft.can_craft(player, craft_type, output, times)
     end
     return times, player_inputs
 end
-
+-- Adds wear to tools as if they were used when required for crafts
+frontier_craft.wear_player_tool = function(inv, tool_name, times)
+    times = times or 1
+    for i, player_tool in ipairs(inv:get_list("main")) do
+        if player_tool:get_name() == tool_name then
+            local uses = player_tool:get_tool_capabilities().uses
+            if uses ~= nil then
+                player_tool:add_wear( 65535/(uses-times))
+            else
+                player_tool:add_wear(1000*times)
+            end
+            inv:set_stack("main", i, player_tool)
+            minetest.sound_play({name = "default_wood_footstep", gain = 1.0})
+            return
+        end
+    end
+end
 -- Craft handler
-function frontier_craft.perform_craft(player, craft_type, output, times)
+frontier_craft.perform_craft = function(player, craft_type, output, times)
     minetest.log("info", "[frontier_craft] Player " .. player:get_player_name() .. " attempting craft: " .. output)
     local player_inv = minetest.get_inventory({type="player", name=player:get_player_name()})
     local privs = minetest.get_player_privs(player:get_player_name())
-    local times = times or 1
+    times = times or 1
     local player_inputs = {}
     times, player_inputs = frontier_craft.can_craft(player, craft_type, output, times)
 
@@ -277,7 +284,6 @@ function frontier_craft.perform_craft(player, craft_type, output, times)
             stamina.exhaust_player(player, ItemStack(output):get_count()*times*2, "crafting")
         end
         -- Tool wear for required_items
-        print("output: ", output)
         local required_item = frontier_craft.registered_crafts[craft_type][output].required_item
         if required_item ~= nil then
             required_item = frontier_craft.player_has_item_or_group(player, required_item):get_name()
@@ -292,30 +298,53 @@ function frontier_craft.perform_craft(player, craft_type, output, times)
     output_stack:set_count(output_stack:get_count() * times
 )
     -- place craft output
-    player_inv:add_item("frontier_craft:output", output_stack)
-    minetest.sound_play({name="default_place_node", gain=1.0})
+    local craft_time = 0
+    minetest.after(craft_time, function()
+        player_inv:add_item("frontier_craft:output", output_stack)
+        minetest.sound_play({name="default_place_node", gain=1.0})
     -- Handle craft replacement items
-    local replacements = frontier_craft.registered_crafts[craft_type][output].replacements
-    if type(replacements) == "table" then
-        for _, replacement in ipairs(replacements) do
-            local item_stack = ItemStack(replacement)
-            item_stack:set_count(item_stack:get_count()*times)
-            if player_inv:room_for_item("frontier_craft:replacements", item_stack) then
-                player_inv:add_item("frontier_craft:replacements", item_stack)
+        local replacements = frontier_craft.registered_crafts[craft_type][output].replacements
+        if type(replacements) == "table" then
+            for _, replacement in ipairs(replacements) do
+                local item_stack = ItemStack(replacement)
+                item_stack:set_count(item_stack:get_count()*times)
+                if player_inv:room_for_item("frontier_craft:replacements", item_stack) then
+                    player_inv:add_item("frontier_craft:replacements", item_stack)
+                end
             end
         end
-    end
-    minetest.log("info", "[frontier_craft] Info: " .. player:get_player_name() .. " crafted " .. output .. " by " .. craft_type)
+        minetest.log("action", "[frontier_craft] " .. player:get_player_name() .. " crafted " .. output .. " by " .. craft_type)
+    end)
     return true
 end
 
 -- Build craft selector for crafting formspecs
-function frontier_craft.craft_page(craft_type, invx, invy, width, height, page_num, selected)
-    local num_pages = math.ceil(#craft_index[craft_type]/(width*height))
-    local formspec = "button[" .. math.floor(width/2)-2 .. "," .. height+0.5 .. ";1,0.75;prev;<]" ..
-        "label[".. math.floor(width/2)-0.5 .."," .. height+0.7 .. ";Page "..page_num.." / "..num_pages.."]" ..
-        "button[".. width/2+1 .."," .. height+0.5 .. ";1,0.75;next;>]"
 
+-- Handle page selection and auto wrapping to beginning or end
+frontier_craft.select_page = function(craft_type, page_num, width, height)
+    local num_pages = math.ceil(#craft_index[craft_type]/(width*height))
+    if page_num == nil then
+        page_num = 1
+    elseif page_num > num_pages then
+        page_num = 1
+    elseif page_num < 1 then
+        page_num = num_pages
+    end
+    return page_num
+end
+
+-- Generate page of available crafts
+frontier_craft.craft_page = function(craft_type, invx, invy, width, height, page_num, selected)
+    local formspec = ""
+    local num_pages = math.ceil(#craft_index[craft_type]/(width*height))
+    
+    if num_pages > 1 then
+        formspec = "button[" .. math.floor(width/2)-2 .. "," .. height+0.5 .. ";1,0.75;prev;<]" ..
+        "label[".. math.floor(width/2)-0.3 .."," .. height+0.5 .. ";"..page_num.." / "..num_pages.."]" ..
+        "button[".. width/2+1 .."," .. height+0.5 .. ";1,0.75;next;>]"
+    end
+    
+    
     local n = 1
     local column = 1
     local num_per_page = width*height
@@ -333,37 +362,90 @@ function frontier_craft.craft_page(craft_type, invx, invy, width, height, page_n
         local y = invy + math.floor((n-1)/width) + 0.5
         local item_name = craft_output
         -- Make selector box
+        -- if selected ~= nil then
+        --     if item_name == selected then
+        --         formspec = formspec .. "box["..(x-0.05)..","..(y-0.05)..";0.9,0.95;#ccca]"
+        --     end
+        -- end
+        formspec = formspec .. "item_image_button["..(x+0.01)..","..(y+0.01)..";1,1;"..item_name..";"..item_name..";]"
         if selected ~= nil then
             if item_name == selected then
-                formspec = formspec .. "box["..(x-0.05)..","..(y-0.05)..";0.9,0.95;#ccca]"
-            end
+            --    formspec = formspec .. "box["..(x-0.05)..","..(y-0.05)..";0.9,0.95;#ccca]"
+                formspec = formspec .. "image["..(x-0.09)..","..(y-0.09)..";1.2,1.2;gui_hotbar_selected.png]"
         end
-        formspec = formspec .. "item_image_button["..x..","..y..";1,1;"..item_name..";"..item_name..";]"
+        end
         column = column + 1
         n = n + 1
     end
     return formspec
 end
 
-function frontier_craft.get_craft_selector(player, craft_type, invx, invy, width, height)
-    local context = sfinv.get_or_create_context(player)
+-- Build selectable craft page
+frontier_craft.get_craft_selector = function(player, craft_type, invx, invy, width, height, page_num, selected)
     local formspec = "label[" .. invx-2 .. ",0;Crafting (".. craft_type .."):]"
     local description = ""
-    if context.selected_craft ~= nil then
-        local selected = ItemStack(context.selected_craft)
-        description = selected:get_description() .. " x " .. selected:get_count()
+    if selected ~= nil then
+        local selected_stack = ItemStack(selected)
+        description = "Selected: " .. selected_stack:get_description() .. " x " .. selected_stack:get_count()
         formspec = formspec .."label[" .. invx+0.2 .. ",0;" .. description .. "]"
     end
 
-    local num_pages = math.ceil(#craft_index[craft_type]/(width*height))
-    if context.page_num == nil then
-        context.page_num = 1
-    elseif context.page_num > num_pages then
-        context.page_num = 1
-    elseif context.page_num < 1 then
-        context.page_num = num_pages
-    end
-
-    formspec = formspec .. frontier_craft.craft_page(craft_type, invx, invy, width, height, context.page_num, context.selected_craft)
+    formspec = formspec .. frontier_craft.craft_page(craft_type, invx, invy, width, height, page_num, selected)
     return formspec
+end
+
+-- Clear input inventory 
+frontier_craft.clear_input_inv_preview = function(playername)
+    if playername == nil then
+        return
+    end
+    local inv = minetest.get_inventory({type="detached", name="frontier_craft"})
+    if not inv then
+        return
+    end
+    local context = sfinv.get_or_create_context(minetest.get_player_by_name(playername))
+    -- Reset input inv to selected handcraft 
+    if context.selected_craft ~= nil and context.selected_craft ~= "" then
+        if frontier_craft.set_input_inv_preview("hand", context.selected_craft, minetest.get_player_by_name(playername)) then
+            return true
+        end
+    end
+    -- Clear input inventory
+    if inv:get_size("inputs") > 0 then
+        for i = 1, inv:get_size("inputs") do
+            inv:set_stack("inputs", i, "")
+        end
+        inv:set_stack("required_item", 1, "")
+        return true
+    end
+end
+
+-- Reset/Populate input inventory
+frontier_craft.set_input_inv_preview = function(craft_type, item_name, player)
+    if frontier_craft.registered_crafts[craft_type][item_name] == nil then
+        return false
+    end
+    local inputs = frontier_craft.registered_crafts[craft_type][item_name]["inputs"]
+    local required_item = frontier_craft.registered_crafts[craft_type][item_name]["required_item"]
+    
+    if craft_type == "hand" then
+        local inv = minetest.get_inventory({type="detached", name="frontier_craft"})
+        local size = frontier_craft.craft_types[craft_type].max_inputs
+        if inv:get_size("inputs") ~= size then
+            inv:set_size("inputs", size)
+        end
+    end
+    for i = 1, inv:get_size("inputs") do
+        if i <= #inputs then
+            inv:set_stack("inputs", i, inputs[i])
+        else
+            inv:set_stack("inputs", i, "")
+        end
+    end
+    if required_item ~= nil then
+        inv:set_stack("required_item", 1, required_item)
+    else
+        inv:set_stack("required_item", 1, "")
+    end
+    return true
 end

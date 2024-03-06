@@ -1,8 +1,8 @@
 temperature = {}
 temperature.registered_on_temp_tick = {}
 local temp_tick = minetest.settings:get("temperature.tick") or 6
-local cold_temp = minetest.settings:get("temperature.cold_temp") or 44
-local hot_temp = minetest.settings:get("temperature.hot_temp") or 84
+local cold_temp = minetest.settings:get("temperature.cold_temp") or 40
+local hot_temp = minetest.settings:get("temperature.hot_temp") or 90
 
 -- Api 
 function temperature.get_temp_tick()
@@ -12,6 +12,7 @@ end
 function temperature.get_cold_temp()
 	return cold_temp
 end
+
 
 function temperature.get_hot_temp()
 	return hot_temp
@@ -26,38 +27,49 @@ function temperature.get_adjusted_temp(pos)
 	
 	--Adjust for environmental factors
 	-- Seasons
-	
-	local max_temp_delta = 10
-	local season = seasons.get_season()
-	local day , days_per_season = seasons.get_day()
-	local season_percent = day/days_per_season
-	if season == "spring" then
-		if season_percent < 0.5 then
-			temp = temp - math.floor((1-season_percent)*max_temp_delta/2)
-		else
-			temp = temp + math.floor(season_percent*max_temp_delta/2)
-		end
-	elseif season == "summer" then
-		if season_percent < 0.5 then
-			temp = temp + math.floor(season_percent*max_temp_delta)
-		elseif season_percent < 0.8 then
-			temp = temp + max_temp_delta
-		else
-			temp = temp + math.floor((1-season_percent)*max_temp_delta)
-		end
-	elseif season == "fall" then
-		if season_percent < 0.5 then
-			temp = temp + math.floor((1-season_percent)*max_temp_delta/2)
-		else
-			temp = temp - math.floor((season_percent)*max_temp_delta/2)
-		end
-	else
-		if season_percent < 0.5 then
-			temp = temp - math.floor(season_percent*max_temp_delta)
-		elseif season_percent < 0.75 then
-			temp = temp - max_temp_delta
-		else
-			temp = temp - math.floor((1-season_percent)*max_temp_delta)
+	if seasons then
+		
+		local season_temp_delta = 20
+		local season = seasons.get_season()
+		local day , days_per_season = seasons.get_day()
+		local season_percent = day/days_per_season
+
+		if season == "spring" then
+			temp = temp - math.floor((1-season_percent)*season_temp_delta)
+
+			-- if season_percent < 0.5 then
+			-- 	temp = temp - math.floor((1-season_percent)*season_temp_delta/2)
+			-- else
+			-- 	temp = temp + math.floor(season_percent*season_temp_delta/2)
+			-- end
+
+		elseif season == "summer" then
+			if season_percent < 0.5 then
+				temp = temp + math.floor((1-season_percent)*season_temp_delta/2)
+			--temp = temp + math.floor(season_percent*season_temp_delta)
+			elseif season_percent < 0.8 then -- Heatwave
+				temp = temp + season_temp_delta/2
+			else
+				temp = temp + math.floor((1-season_percent)*season_temp_delta/2)
+			end
+		elseif season == "fall" then
+			temp = temp - math.floor((season_percent)*season_temp_delta)
+
+			-- if season_percent < 0.5 then
+			-- 	temp = temp + math.floor((1-season_percent)*season_temp_delta/2)
+			-- else
+			-- 	temp = temp - math.floor((season_percent)*season_temp_delta/2)
+			-- end
+		elseif season == "winter" then
+			
+			temp = temp - season_temp_delta/2
+			if season_percent < 0.5 then
+				temp = temp - math.floor(season_percent*season_temp_delta)
+			elseif season_percent < 0.75 then
+				temp = temp - season_temp_delta
+			else
+				temp = temp - math.floor((1-season_percent)*season_temp_delta)
+			end
 		end
 	end
 	-- Elevation
@@ -66,14 +78,15 @@ function temperature.get_adjusted_temp(pos)
 	
 	-- Time of day
 	local timeofday = minetest.get_timeofday()
-	if timeofday < 0.25 then -- Early morning make it cooler
+	-- Early morning make it cooler
+	if timeofday < 0.25 then
 		temp = temp - math.floor(timeofday*10)
 	elseif timeofday > 0.4 and timeofday < 0.75 then -- Afternoon, make it hotter
 		temp = temp + math.floor(timeofday*10)
 	end
 	
 	-- Light level
-	local above = pos
+	local above = table.copy(pos)
 	above.y = above.y + 1
 	local light_level = minetest.get_node_light(above) or 0
 	temp = temp + light_level
@@ -84,10 +97,9 @@ function temperature.get_adjusted_temp(pos)
 		{
 			"group:igniter",
 			"default:furnace_active",
-			"fake_fire:embers",
-			"fake_fire:fake_fire",
-			"fake_fire:fake_fire_d",
-			"fake_fire:smokeless_fire",
+			"frontier_craft:forge_active",
+			"frontier_craft:embers",
+			"frontier_craft:basic_fire",
 		}
 	)
 
@@ -127,7 +139,6 @@ end)
 
 
 local mp = minetest.get_modpath("temperature")
-
 dofile(mp .. "/statbar.lua")
 if stamina ~= nil then
 	dofile(mp .. "/stamina.lua")

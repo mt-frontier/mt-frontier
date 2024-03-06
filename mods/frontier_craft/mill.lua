@@ -4,7 +4,7 @@ frontier_craft.mill.recipes = {}
 minetest.register_craftitem("frontier_craft:mill_wheel", {
 	description = "Stone Mill Wheel",
 	inventory_image = "frontier_craft_mill_wheel.png",
-	wield_iamge = "frontier_craft_mill_wheel.png"
+	wield_image = "frontier_craft_mill_wheel.png"
 })
 
 

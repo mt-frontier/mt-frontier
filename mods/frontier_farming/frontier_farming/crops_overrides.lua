@@ -1,87 +1,280 @@
-if not crops.difficulty then
-	crops.settings = {
-		chance = 16,
-		interval = 120,
-		light = 13,
-		watercan = 25,
-		watercan_max = 100,
-		watercan_uses = 20,
-		damage_chance = 4,
-		damage_interval = 30,
-		damage_tick_min = 3,
-		damage_tick_max = 7,
-		damage_max = 100,
-		hydration = true,
-	}
-end
+-- Default crops setting
+-- print("Crops:")
+-- --if not crops.difficulty then
+-- 	crops.settings = {
+-- 		chance = 8,
+-- 		interval = 99,
+-- 		light = 13,
+-- 		watercan = 25,
+-- 		watercan_max = 100,
+-- 		watercan_uses = 24,
+-- 		damage_chance = 4,
+-- 		damage_interval = 128,
+-- 		damage_tick_min = 3,
+-- 		damage_tick_max = 7,
+-- 		damage_max = 100,
+-- 		hydration = true,
+-- 	}
+--end
+-- Support temperature/seasonal restrictions
 
+-- crops.find_plant = function(node)
+-- 	for i = 1,table.getn(crops.plants) do
+-- 		if crops.plants[i].name == node.name then
+-- 			return crops.plants[i]
+-- 		end
+-- 	end
+-- 	return false
+-- end
 
+-- crops.can_grow = function(pos)
+-- 	print(minetest.pos_to_string(pos), " can grow?")
+-- 	if minetest.get_node_light(pos) < crops.settings.light then
+-- 		return false
+-- 	end
+-- 	local node = minetest.get_node(pos)
+-- 	local plant = crops.find_plant(node)
+-- 	if not plant then
+-- 		return false
+-- 	end
+
+-- 	crops.set_infotext(pos)
+
+-- 	if temperature then
+-- 		local temp = temperature.get_adjusted_temp(pos)
+-- 		if temp < plant.properties.cold_damage then
+-- 			return false
+-- 		elseif temp < plant.properties.cold then
+-- 			if math.random(0,1) == 0 then
+-- 				return false
+-- 			end
+-- 		end
+-- 	end
+-- 	local meta = minetest.get_meta(pos)
+-- 	local time_grew = meta:get_int("crops_time_grew")
+-- 	if time_grew > 0 then
+-- 		local time_to_grow = plant.properties.time_to_grow
+-- 		if time_to_grow then
+-- 			if minetest.get_gametime() < time_to_grow + time_grew then
+-- 				print("can't grow yet")
+-- 				return false
+-- 			end
+-- 		end
+-- 	end
+
+-- 	if crops.settings.hydration then
+-- 		local water = meta:get_int("crops_water")
+-- 		crops.update_soil_under_crop(pos)
+-- 		if water < plant.properties.wither_damage or water > plant.properties.soak_damage then
+-- 			if math.random(0,100) > math.max(20, water) then
+-- 				return false
+-- 			end
+-- 		elseif water < plant.properties.wither or water > plant.properties.soak then
+-- 			if math.random(0,1) == 0 then
+-- 				return false
+-- 			end
+
+-- 		end
+-- 	end
+
+-- 	local damage = meta:get_int("crops_damage")
+-- 	if not damage == 0 then
+-- 		if math.random(math.min(50, damage), 100) > 75 then
+-- 			return false
+-- 		end
+-- 	end
+-- 	-- allow the plant to grow
+-- 	return true
+-- end
+
+-- crops.grow = function(pos)
+-- 	local plant = crops.find_plant(minetest.get_node(pos))
+-- 	if not plant then
+-- 		return
+-- 	end
+-- 	if not plant.properties.grow then
+-- 		return
+-- 	end
+-- 	plant.properties.grow(pos)
+-- 	local meta = minetest.get_meta(pos)
+-- 	meta:set_int("crops_time_grew", minetest.get_gametime())
+-- 	-- growing costs water!
+-- 	if crops.settings.hydration then
+-- 		local water = meta:get_int("crops_water")
+-- 		meta:set_int("crops_water", math.max(1, water - plant.properties.wateruse))
+-- 	end
+-- end
+
+-- Update Crops' infotext
+-- crops.set_infotext = function(pos)
+-- 	local node = minetest.get_node(pos)
+-- 	local plant = crops.find_plant(node)
+-- 	if not plant then
+-- 		return
+-- 	end
+-- 	local meta = minetest.get_meta(pos)
+-- 	local infotext = minetest.registered_nodes[node.name].description
+-- 	if crops.settings.hydration then
+-- 		infotext = infotext .. "\nWater Level: " .. meta:get_int("crops_water")  .. "%"
+-- 	end
+-- 	infotext = infotext .. "\nDamage Level: " .. meta:get_int("crops_damage") .. "%"
+-- 	meta:set_string("infotext", infotext)
+-- end
+
+-- Fix beanpoles from turning soil to base dirt by adding to flora group
 minetest.override_item("crops:beanpole_base", {
 	groups = {seed=1,snappy=3,flammable=3,flora=1,attached_node=1,not_in_creative_inventory=1 },
 })
 
-minetest.override_item("crops:watering_can", {
-	on_use = function(itemstack, user, pointed_thing)
-		local pos = pointed_thing.under
-		local ppos = pos
-		if not pos then
-			return itemstack
-		end
-		-- filling it up?
-		local wear = itemstack:get_wear()
-		if minetest.get_item_group(minetest.get_node(pos).name, "water") >= 3 then
-			if wear ~= 1 then
-				minetest.sound_play("crops_watercan_entering", {pos=pos, gain=0.8})
-				minetest.after(math.random()/2, function(p)
-					if math.random(2) == 1 then
-						minetest.sound_play("crops_watercan_splash_quiet", {pos=p, gain=0.1})
-					end
-					if math.random(3) == 1 then
-						minetest.after(math.random()/2, function(pp)
-							minetest.sound_play("crops_watercan_splash_small", {pos=pp, gain=0.7})
-						end, p)
-					end
-					if math.random(3) == 1 then
-						minetest.after(math.random()/2, function(pp)
-							minetest.sound_play("crops_watercan_splash_big", {pos=pp, gain=0.7})
-						end, p)
-					end
-				end, pos)
-				itemstack:set_wear(1)
-			end
-			return itemstack
-		end
-		-- using it on a top-half part of a plant?
-		local meta = minetest.get_meta(pos)
-		if meta:get_int("crops_top_half") == 1 then
-			meta = minetest.get_meta({x=pos.x, y=pos.y-1, z=pos.z})
-		end
-		-- using it on a plant?
-		local water = meta:get_int("crops_water")
-		if water < 1 then
-			local node = minetest.get_node(pos)
-			if minetest.get_item_group(node.name, "plant") == 0 
-			and minetest.get_item_group(node.name, "seed") == 0 
-			and minetest.get_item_group(node.name, "flora") == 0 then
-				return itemstack
-			end
-		end
-		-- empty?
-		if wear == 65534 then
-			return itemstack
-		end
-		crops.particles(ppos, 2)
-		minetest.sound_play("crops_watercan_watering", {pos=pos, gain=0.8})
-		water = math.min(water + crops.settings.watercan, crops.settings.watercan_max)
-		
-		meta:set_int("crops_water", water)
-		-- Wet farming soil underneath if dry
-		local soil_pos = {x=pos.x, y=pos.y-1, z=pos.z}
-		farming.wet_soil_in_area(soil_pos, 1)
+-- Override watering can to support watering a radius around pointed node
+-- minetest.override_item("crops:watering_can", {
+-- 	on_use = function(itemstack, user, pointed_thing)
+-- 		local pos = pointed_thing.under
+-- 		local ppos = pos
+-- 		if not pos then
+-- 			return itemstack
+-- 		end
+-- 		-- filling it up?
+-- 		local wear = itemstack:get_wear()
+-- 		if minetest.get_item_group(minetest.get_node(pos).name, "water") >= 3 then
+-- 			if wear ~= 1 then
+-- 				minetest.sound_play("crops_watercan_entering", {pos=pos, gain=0.8})
+-- 				minetest.after(math.random()/2, function(p)
+-- 					if math.random(2) == 1 then
+-- 						minetest.sound_play("crops_watercan_splash_quiet", {pos=p, gain=0.1})
+-- 					end
+-- 					if math.random(3) == 1 then
+-- 						minetest.after(math.random()/2, function(pp)
+-- 							minetest.sound_play("crops_watercan_splash_small", {pos=pp, gain=0.7})
+-- 						end, p)
+-- 					end
+-- 					if math.random(3) == 1 then
+-- 						minetest.after(math.random()/2, function(pp)
+-- 							minetest.sound_play("crops_watercan_splash_big", {pos=pp, gain=0.7})
+-- 						end, p)
+-- 					end
+-- 				end, pos)
+-- 				itemstack:set_wear(1)
+-- 			end
+-- 			return itemstack
+-- 		end
+-- 		-- using it on a top-half part of a plant?
+-- 		local meta = minetest.get_meta(pos)
+-- 		if meta:get_int("crops_top_half") == 1 then
+-- 			meta = minetest.get_meta({x=pos.x, y=pos.y-1, z=pos.z})
+-- 		end
+-- 		-- using it on a plant?
+-- 		local water = meta:get_int("crops_water")
+-- 		if water < 1 then
+-- 			local node = minetest.get_node(pos)
+-- 			if minetest.get_item_group(node.name, "plant") == 0
+-- 			and minetest.get_item_group(node.name, "seed") == 0
+-- 			and minetest.get_item_group(node.name, "flora") == 0 then
+-- 				return itemstack
+-- 			end
+-- 		end
+-- 		-- empty?
+-- 		if wear == 65534 then
+-- 			return itemstack
+-- 		end
+-- 		crops.particles(ppos, 2)
+-- 		minetest.sound_play("crops_watercan_watering", {pos=pos, gain=0.8})
+-- 		water = math.min(water + crops.settings.watercan, crops.settings.watercan_max)
 
-		if not minetest.settings:get_bool("creative_mode") then
-			itemstack:set_wear(math.min(65534, wear + (65535 / crops.settings.watercan_uses)))
-		end
-		return itemstack
-	end
-})
+-- 		meta:set_int("crops_water", water)
+-- 		crops.set_infotext(pos)
+-- 		-- Wet farming soil underneath if dry
+-- 		crops.update_soil_under_crop(pos)
+
+-- 		if not minetest.settings:get_bool("creative_mode") then
+-- 			itemstack:set_wear(math.min(65534, wear + (65535 / crops.settings.watercan_uses)))
+-- 		end
+-- 		return itemstack
+-- 	end
+-- })
+
+-- -- Wet/dry soil under crops integrated with crop water level
+
+-- crops.update_soil_under_crop = function(crop_pos)
+-- 	local plant = crops.find_plant(minetest.get_node(crop_pos))
+-- 	if not plant then
+-- 		return
+-- 	end
+-- 	local watered = minetest.get_meta(crop_pos):get_int("crops_water") > plant.properties.wither
+-- 	local pos = {x=crop_pos.x, y=crop_pos.y-1, z=crop_pos.z}
+-- 	local node = minetest.get_node(pos)
+--     local n_def = minetest.registered_nodes[node.name] or nil
+-- 	if n_def == nil then
+-- 		return
+-- 	elseif n_def.soil == nil then
+-- 		return
+-- 	end
+-- 	local wet = n_def.soil.wet or nil
+-- 	local base = n_def.soil.base or nil
+-- 	local dry = n_def.soil.dry or nil
+-- 	if not wet or not base or not dry then
+-- 		return
+-- 	end
+-- 	if watered and node.name == dry then
+--         minetest.set_node(pos, {name=wet})
+--     elseif not watered and node.name == wet then
+-- 		minetest.set_node(pos, {name=dry})
+-- 	end
+-- end
+
+-- Override default farming function to include support for crops and other common plant groups
+-- function farming.update_soil(pos, node)
+-- 	local n_def = minetest.registered_nodes[node.name] or nil
+-- 	local wet = n_def.soil.wet or nil
+-- 	local base = n_def.soil.base or nil
+-- 	local dry = n_def.soil.dry or nil
+-- 	if not n_def or not n_def.soil or not wet or not base or not dry then
+-- 		return
+-- 	end
+
+-- 	pos.y = pos.y + 1
+-- 	local nn = minetest.get_node_or_nil(pos)
+-- 	if not nn or not nn.name then
+-- 		return
+-- 	end
+-- 	local nn_def = minetest.registered_nodes[nn.name] or nil
+-- 	pos.y = pos.y - 1
+
+-- 	if nn_def and nn_def.walkable and minetest.get_item_group(nn.name, "plant") == 0 then
+-- 		minetest.set_node(pos, {name = base})
+-- 		return
+-- 	end
+-- 	-- check if there is water nearby
+-- 	local wet_lvl = minetest.get_item_group(node.name, "wet")
+-- 	if minetest.find_node_near(pos, 2, {"group:water"}) then
+-- 		-- if it is dry soil and not base node, turn it into wet soil
+-- 		if wet_lvl == 0 then
+-- 			minetest.set_node(pos, {name = wet})
+-- 		end
+-- 	else
+-- 		-- only turn back if there are no unloaded blocks (and therefore
+-- 		-- possible water sources) nearby
+-- 		if not minetest.find_node_near(pos, 2, {"ignore"}) then
+-- 			-- turn it back into base if it is already dry
+-- 			if wet_lvl == 0 then
+-- 				-- only turn it back if there is no plant/seed on top of it
+-- 				if minetest.get_item_group(nn.name, "plant") == 0
+-- 				and minetest.get_item_group(nn.name, "seed") == 0
+-- 				and minetest.get_item_group(nn.name, "flora") == 0 then
+-- 					minetest.set_node(pos, {name = base})
+-- 				end
+
+-- 			-- if its wet turn it back into dry soil
+-- 			elseif wet_lvl >= 1 then
+-- 				local above = {x=pos.x, y=pos.y+1, z=pos.z}
+-- 				local watered = minetest.get_meta(above):get_int("crops_water")
+-- 				local plant = crops.find_plant(minetest.get_node(above))
+-- 				if not plant or watered <= plant.properties.wither then
+-- 					-- watered at least once or water source was recently removed.
+-- 					-- Node remains watered longer in cooler temps
+-- 					minetest.set_node(pos, {name = dry})
+-- 				end
+-- 			end
+-- 		end
+-- 	end
+-- end

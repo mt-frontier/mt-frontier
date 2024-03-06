@@ -24,22 +24,24 @@ minetest.register_node("crops:pumpkin_seed", {
 	description = S("Pumpkin seed"),
 	inventory_image = "crops_pumpkin_seed.png",
 	wield_image = "crops_pumpkin_seed.png",
-	tiles = { "crops_pumpkin_plant_1.png" },
-	drawtype = "plantlike",
-	waving = 1,
+	tiles = { "crops_pumpkin_seed.png" },
+	visual_scale = 0.25,
+	drawtype = "signlike",
 	sunlight_propagates = false,
 	use_texture_alpha = true,
 	walkable = false,
 	paramtype = "light",
-	node_placement_prediction = "crops:pumpkin_plant_1",
 	groups = { snappy=3,flammable=3,flora=1,attached_node=1 },
-
+	selection_box = {
+		type = "fixed",
+		fixed = crops.selection_boxes.seed
+	},
 	on_place = function(itemstack, placer, pointed_thing)
 		local under = minetest.get_node(pointed_thing.under)
 		if minetest.get_item_group(under.name, "soil") <= 1 then
 			return
 		end
-		crops.plant(pointed_thing.above, {name="crops:pumpkin_plant_1"})
+		crops.plant(pointed_thing.above, {name="crops:pumpkin_seed"})
 		if not minetest.settings:get_bool("creative_mode") then
 			itemstack:take_item()
 		end
@@ -62,7 +64,7 @@ minetest.register_node("crops:pumpkin_plant_" .. stage , {
 	sounds = default.node_sound_leaves_defaults(),
 	selection_box = {
 		type = "fixed",
-		fixed = {-0.5, -0.5, -0.5,  0.5, -0.5 + (((math.min(stage, 4)) + 1) / 5), 0.5}
+		fixed = crops.selection_boxes.base
 	}
 })
 end
@@ -81,24 +83,22 @@ minetest.register_node("crops:pumpkin_plant_5_attached", {
 	groups = { snappy=3, flammable=3, flora=1, attached_node=1, not_in_creative_inventory=1 },
 	drop = "crops:pumpkin_seed",
 	sounds = default.node_sound_leaves_defaults(),
+	selection_box = {
+		type = "fixed",
+		fixed = crops.selection_boxes.base
+	}
 })
 
 
 minetest.register_craftitem("crops:roasted_pumpkin", {
 	description = S("Roasted pumpkin"),
 	inventory_image = "crops_roasted_pumpkin.png",
-	on_use = minetest.item_eat(2)
-})
-
-minetest.register_craft({
-	type = "shapeless",
-	output = "crops:pumpkin_seed",
-	recipe = { "crops:pumpkin" }
+	on_use = minetest.item_eat(2, "crops:pumpkin_seed")
 })
 
 minetest.register_craft({
 	type = "cooking",
-	output = "crops:roasted_pumpkin",
+	output = "crops:roasted_pumpkin 4",
 	recipe = "crops:pumpkin"
 })
 
@@ -135,38 +135,30 @@ minetest.register_node("crops:pumpkin", {
 	end
 })
 
---
--- grows a plant to mature size
---
-minetest.register_abm({
-	nodenames = { "crops:pumpkin_plant_1", "crops:pumpkin_plant_2", "crops:pumpkin_plant_3","crops:pumpkin_plant_4" },
-	neighbors = { "group:soil" },
-	interval = crops.settings.interval,
-	chance = crops.settings.chance,
-	action = function(pos, node, active_object_count, active_object_count_wider)
-		if not crops.can_grow(pos) then
-			return
-		end
-		local n = string.gsub(node.name, "4", "5")
-		n = string.gsub(n, "3", "4")
-		n = string.gsub(n, "2", "3")
-		n = string.gsub(n, "1", "2")
-		minetest.swap_node(pos, { name = n })
-	end
-})
+-- --
+-- -- grows a pumpkin
+-- --
 
---
--- grows a pumpkin
---
-minetest.register_abm({
-	nodenames = { "crops:pumpkin_plant_5" },
-	neighbors = { "group:soil" },
-	interval = crops.settings.interval,
-	chance = crops.settings.chance,
-	action = function(pos, node, active_object_count, active_object_count_wider)
-		if not crops.can_grow(pos) then
-			return
+crops.pumpkin_grow = function(pos)
+	local node = minetest.get_node(pos)
+	local n = node.name
+	if n == "crops:pumpkin_plant_5_attached" then
+		for face = 1, 4 do
+			local t = { x = pos.x + faces[face].x, y = pos.y, z = pos.z + faces[face].z }
+			if minetest.get_node(t).name == "crops:pumpkin" then
+				return
+			end
 		end
+		local meta = minetest.get_meta(pos)
+		local ttl = meta:get_int("crops_pumpkin_ttl")
+		if ttl > 1 then
+			minetest.swap_node(pos, { name = "crops:pumpkin_plant_4" })
+			meta:set_int("crops_pumpkin_ttl", ttl)
+		else
+			crops.die(pos)
+		end
+	end
+	if n == "crops:pumpkin_plant_5" then
 		for face = 1, 4 do
 			local t = { x = pos.x + faces[face].x, y = pos.y, z = pos.z + faces[face].z }
 			if minetest.get_node(t).name == "crops:pumpkin" then
@@ -208,34 +200,17 @@ minetest.register_abm({
 			-- growing a pumpkin costs 25 water!
 			meta:set_int("crops_water", math.max(0, water - 25))
 		end
-	end
-})
-
---
--- return a pumpkin to a normal one if there is no pumpkin attached, so it can
--- grow a new pumpkin again
---
-minetest.register_abm({
-	nodenames = { "crops:pumpkin_plant_5_attached" },
-	interval = crops.settings.interval,
-	chance = 1,
-	action = function(pos, node, active_object_count, active_object_count_wider)
-		for face = 1, 4 do
-			local t = { x = pos.x + faces[face].x, y = pos.y, z = pos.z + faces[face].z }
-			if minetest.get_node(t).name == "crops:pumpkin" then
-				return
-			end
+	else
+		n = string.gsub(node.name, "4", "5")
+		n = string.gsub(n, "3", "4")
+		n = string.gsub(n, "2", "3")
+		n = string.gsub(n, "1", "2")
+		if n == "crops:pumpkin_seed" then
+			n = "crops:pumpkin_plant_1"
 		end
-		local meta = minetest.get_meta(pos)
-		local ttl = meta:get_int("crops_pumpkin_ttl")
-		if ttl > 1 then
-			minetest.swap_node(pos, { name = "crops:pumpkin_plant_4" })
-			meta:set_int("crops_pumpkin_ttl", ttl)
-		else
-			crops.die(pos)
-		end
+		minetest.swap_node(pos, { name = n })
 	end
-})
+end
 
 crops.pumpkin_die = function(pos)
 	minetest.set_node(pos, { name = "crops:pumpkin_plant_6" })
@@ -243,15 +218,20 @@ end
 
 local properties = {
 	die = crops.pumpkin_die,
-	waterstart = 40,
+	grow = crops.pumpkin_grow,
+	waterstart = 15,
 	wateruse = 1,
 	night = 5,
-	soak = 80,
-	soak_damage = 90,
+	soak = 70,
+	soak_damage = 80,
 	wither = 10,
 	wither_damage = 5,
+	cold = 38,
+    cold_damage = 28,
+    time_to_grow = 1300
 }
 
+crops.register({ name = "crops:pumpkin_seed", properties = properties})
 crops.register({ name = "crops:pumpkin_plant_1", properties = properties })
 crops.register({ name = "crops:pumpkin_plant_2", properties = properties })
 crops.register({ name = "crops:pumpkin_plant_3", properties = properties })

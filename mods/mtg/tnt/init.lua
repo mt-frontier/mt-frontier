@@ -324,9 +324,8 @@ local function tnt_explode(pos, radius, ignore_protection, ignore_on_blast, owne
 	local drops = {}
 	local on_blast_queue = {}
 	local on_construct_queue = {}
-	basic_flame_on_construct = minetest.registered_nodes["fire:basic_flame"].on_construct
-
-	local c_fire = minetest.get_content_id("fire:basic_flame")
+	basic_flame_on_construct = minetest.registered_nodes["frontier_craft:basic_fire"].on_construct
+	local c_fire = minetest.get_content_id("frontier_craft:basic_fire")
 	for z = -radius, radius do
 	for y = -radius, radius do
 	local vi = a:index(pos.x + (-radius), pos.y + y, pos.z + z)

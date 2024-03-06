@@ -19,6 +19,18 @@ of the license, or (at your option) any later version.
 -- Intllib
 local S = crops.intllib
 
+minetest.register_craftitem("crops:unbaked_watering_jug", {
+	description = S("Unbaked watering jug"),
+	inventory_image = "crops_unbaked_watering_jug.png",
+	weild_image = "crops_unbaked_watering_jug.png"
+})
+
+minetest.register_craft({
+    type = "cooking",
+    output = "crops:watering_jug",
+	recipe = "crops:unbaked_watering_jug"
+})
+
 minetest.register_craftitem("crops:unbaked_clay_bowl", {
 	description = S("Unbaked clay bowl"),
 	inventory_image = "crops_unbaked_clay_bowl.png",
@@ -73,3 +85,4 @@ minetest.register_craft({
 		{ "", "group:food_bowl", "" }
 	}
 })
+

@@ -603,7 +603,7 @@ minetest.register_node("default:snow", {
 
 	on_construct = function(pos)
 		pos.y = pos.y - 1
-		if minetest.get_node(pos).name == "default:dirt_with_grass" then
+		if minetest.get_item_group(pos, "soil") then
 			minetest.set_node(pos, {name = "default:dirt_with_snow"})
 		end
 	end,

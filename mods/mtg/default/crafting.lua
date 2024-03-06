@@ -580,11 +580,7 @@ minetest.register_craft({
 --
 
 -- Support use of group:tree, includes default:tree which has the same burn time
-minetest.register_craft({
-	type = "fuel",
-	recipe = "group:tree",
-	burntime = 30,
-})
+
 
 -- Burn time for all woods are in order of wood density,
 -- which is also the order of wood colour darkness:
@@ -616,11 +612,7 @@ minetest.register_craft({
 
 
 -- Support use of group:wood, includes default:wood which has the same burn time
-minetest.register_craft({
-	type = "fuel",
-	recipe = "group:wood",
-	burntime = 7,
-})
+
 
 minetest.register_craft({
 	type = "fuel",
@@ -648,11 +640,7 @@ minetest.register_craft({
 
 
 -- Support use of group:sapling, includes default:sapling which has the same burn time
-minetest.register_craft({
-	type = "fuel",
-	recipe = "group:sapling",
-	burntime = 5,
-})
+
 
 minetest.register_craft({
 	type = "fuel",
@@ -789,11 +777,7 @@ minetest.register_craft({
 	burntime = 3,
 })
 
-minetest.register_craft({
-	type = "fuel",
-	recipe = "group:leaves",
-	burntime = 4,
-})
+
 
 minetest.register_craft({
 	type = "fuel",
@@ -855,17 +839,6 @@ minetest.register_craft({
 	burntime = 30,
 })
 
-minetest.register_craft({
-	type = "fuel",
-	recipe = "default:coal_lump",
-	burntime = 40,
-})
-
-minetest.register_craft({
-	type = "fuel",
-	recipe = "default:coalblock",
-	burntime = 370,
-})
 
 minetest.register_craft({
 	type = "fuel",
@@ -913,12 +886,6 @@ minetest.register_craft({
 	type = "fuel",
 	recipe = "default:dry_shrub",
 	burntime = 2,
-})
-
-minetest.register_craft({
-	type = "fuel",
-	recipe = "group:stick",
-	burntime = 1,
 })
 
 

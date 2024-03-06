@@ -12,12 +12,14 @@ minetest.register_craftitem("frontier_plants:cattail_tuber", {
 		local above2 = {x = above.x, y = above.y + 1, z = above.z}
 		local under = pointed_thing.under
 		if minetest.get_node(under).name == "default:dirt"
-		and minetest.get_item_group(minetest.get_node(above).name, "water") > 0 
-		and minetest.get_node(above2).name == "air" then	
+		and minetest.get_item_group(minetest.get_node(above).name, "water") > 0
+		and minetest.get_node(above2).name == "air" then
 			minetest.set_node(under, {name="frontier_plants:planted_cattail", param2 = 16})
 			itemstack:take_item(1)
-			return itemstack
+		else
+			return minetest.item_place(itemstack, placer, pointed_thing)
 		end
+		return itemstack
 	end
 })
 
@@ -32,8 +34,10 @@ minetest.register_craft({
 	type = "cooking",
 	output = "frontier_plants:cattail_tuber_roasted",
 	recipe = "frontier_plants:cattail_tuber",
-	cooktime = 2
+	cooktime = 4
 })
+
+frontier_craft.register_craft("pot", "frontier_plants:cattail_tuber_roasted", {inputs={"frontier_plants:cattail_tuber"}})
 
 minetest.register_node("frontier_plants:planted_cattail", {
 	description = "Planted Cattail",

@@ -2,7 +2,7 @@ seasons = {}
 local mod_storage = minetest.get_mod_storage()
 local default_time_speed = minetest.settings:get("time_speed")
 local base_time_speed = default_time_speed or 60
-local days_per_season = minetest.settings:get("seasons.days_per_season") or 90
+local days_per_season = minetest.settings:get("seasons.days_per_season") or 30
 local time_speed_delta_divisor = minetest.settings:get("seasons.time_speed_delta_divisor") or 5
 local season_update_tick = minetest.settings:get("seasons.season_update_tick") or 20
 
@@ -31,6 +31,9 @@ seasons.get_time_speed = function()
     return tonumber(minetest.settings:get("time_speed"))
 end
 
+seasons.get_base_time_speed = function ()
+    return base_time_speed
+end
 
 seasons.change_season = function()
     seasons.set_day_number(1)
@@ -79,10 +82,8 @@ local update_time_speed = function()
 end
 
 -- Initiate seasons on game start up.
-print("seasons: ", seasons.get_season())
 if seasons.get_season() == "" then
     seasons.change_season()
-    print("seasons: ", seasons.get_season())
 end
 --set time speed for current season and day
 minetest.after(3, function()
@@ -102,10 +103,8 @@ minetest.register_globalstep(function(dtime)
     season_timer = 0
     local time = minetest.get_timeofday()*24000
     local tick_window = 1200*season_update_tick/60 -- leave a window to update slightly longer than tick incase of lag
-    print("Seasons tick: ", time)
     -- Update day number first tick after midnight
     if time <= tick_window then
-        print("Seasons midnight:" .. time)
         local day_number, days_per_season = seasons.get_day()
         day_number = day_number + 1
         if day_number > days_per_season then
@@ -117,7 +116,6 @@ minetest.register_globalstep(function(dtime)
     -- Update time on first tick after dusk/dawn
     if (time >= 6000 and time < 6000+tick_window)
     or (time >= 18000 and time < 18000+tick_window) then
-        print("Seasons updating time speed: ", time)
         update_time_speed()
     end
 end)
@@ -143,7 +141,7 @@ minetest.register_chatcommand("season", {
 minetest.register_chatcommand("set_season", {
     params = "season_name",
     description = "Set current season",
-    privs = {server=true},
+    privs = {settime=true},
     func = function(name, param)
         if param ~= "spring" and param ~= "summer" and param ~= "fall" and param ~= "winter" then
             minetest.chat_send_player(name, "Valid season names are spring, summer, fall or winter")
@@ -159,7 +157,7 @@ minetest.register_chatcommand("set_season", {
 minetest.register_chatcommand("set_day", {
     params = "day_number",
     description = "Set season's day number",
-    privs = {server=true},
+    privs = {settime=true},
     func = function(name, param)
         day_number = tonumber(param)
         if day_number <= 0 or day_number > days_per_season then

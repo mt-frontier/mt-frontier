@@ -1,26 +1,28 @@
 local input_inv_name = "frontier_craft:hand"
+local width = 6
+local height = 3
 
-local function set_craft_input_preview(item_key, player)
-    if frontier_craft.registered_crafts["hand"][item_key] == nil then
-        return false
-    end
-    local inputs = frontier_craft.registered_crafts["hand"][item_key]["inputs"]
-    local required_item = frontier_craft.registered_crafts["hand"][item_key]["required_item"]
-    local inv = minetest.get_inventory({type="detached", name=input_inv_name, player_name=player:get_player_name()})
-    for i = 1, inv:get_size("inputs") do
-        if i <= #inputs then
-            inv:set_stack("inputs", i, inputs[i])
-        else
-            inv:set_stack("inputs", i, "")
-        end
-    end
-    if required_item ~= nil then
-        inv:set_stack("required_item", 1, required_item)
-    else
-        inv:set_stack("required_item", 1, "")
-    end
-    return true
-end
+-- local function set_craft_input_preview(item_key, player)
+--     if frontier_craft.registered_crafts["hand"][item_key] == nil then
+--         return false
+--     end
+--     local inputs = frontier_craft.registered_crafts["hand"][item_key]["inputs"]
+--     local required_item = frontier_craft.registered_crafts["hand"][item_key]["required_item"]
+--     local inv = minetest.get_inventory({type="detached", name=input_inv_name, player_name=player:get_player_name()})
+--     for i = 1, inv:get_size("inputs") do
+--         if i <= #inputs then
+--             inv:set_stack("inputs", i, inputs[i])
+--         else
+--             inv:set_stack("inputs", i, "")
+--         end
+--     end
+--     if required_item ~= nil then
+--         inv:set_stack("required_item", 1, required_item)
+--     else
+--         inv:set_stack("required_item", 1, "")
+--     end
+--     return true
+-- end
 -- Hand crafting in sfinv
 sfinv.override_page("sfinv:crafting", {
 	title = "Crafting",
@@ -29,13 +31,19 @@ sfinv.override_page("sfinv:crafting", {
             context.page_num = 1
         end
 
+        local selected = context.selected_craft
+        if selected == "" or not selected then
+            frontier_craft.clear_input_inv_preview(player:get_player_name())
+        else
+            frontier_craft.set_input_inv_preview("hand", selected, player)
+        end
+
         local formspec = [[
             container[2,0]
         ]]
-        ..frontier_craft.get_craft_selector(player, "hand", 0, 0, 6, 3)..
+        .. frontier_craft.get_craft_selector(player, "hand", 0, 0, width, height, context.page_num, context.selected_craft) ..
         [[
             container_end[]
-    
 
             container[8,0]
             button[0,0;0.75,1;craft_one;x1]
@@ -47,12 +55,16 @@ sfinv.override_page("sfinv:crafting", {
             .."list[current_player;frontier_craft:replacements;0,3.5;2,1;]"..
         [[
             container_end[]
+
             container[0,0]
             label[0,0.5;Required Materials]
-            list[detached:frontier_craft:hand;inputs;0,1;2,2;] 
+            list[detached:frontier_craft;inputs;0,1;2,2;] 
             label[0,3;Required Item]
-            list[detached:frontier_craft:hand;required_item;0,3.5;1,1;]
+            list[detached:frontier_craft;required_item;0,3.5;1,1;]
             container_end[]
+            listring[current_player;frontier_craft:output]
+            listring[current_player;main]
+            listring[current_player;frontier_craft:replacements]
             listring[current_player;main]
         ]]
 
@@ -61,16 +73,23 @@ sfinv.override_page("sfinv:crafting", {
     on_player_receive_fields = function(self, player, context, fields)
         if context ~= nil then
             if context.page == "sfinv:crafting" then
+                -- if fields.quit then
+                --     frontier_craft.clear_input_inv_preview(player:get_player_name())
+                --     return
+                -- end
+
                 -- Handle paging in craft selector
                 if fields.next then
-                    print("next")
-                    context.page_num = context.page_num + 1
+                    context.page_num = frontier_craft.select_page("hand", context.page_num + 1, width, height)
                     sfinv.set_page(player, context.page)
+                    sfinv.get_formspec(player, context)
+                    return
                 elseif fields.prev then
-                    context.page_num = context.page_num - 1
+                    context.page_num = frontier_craft.select_page("hand", context.page_num - 1, width, height)
                     sfinv.set_page(player, context.page)
+                    return
                 end
-                
+
                 -- Handle crafting
                 if context.selected_craft ~= nil then
                     if fields.craft_max or fields.craft_ten then
@@ -85,6 +104,7 @@ sfinv.override_page("sfinv:crafting", {
 
                         frontier_craft.perform_craft(player, "hand", context.selected_craft, times)
                         return
+
                     elseif fields.craft_one then
                         frontier_craft.perform_craft(player, "hand", context.selected_craft, 1)
                         return
@@ -93,7 +113,7 @@ sfinv.override_page("sfinv:crafting", {
                 -- handle craft selector buttons
                 for key, _ in pairs(fields) do
                     -- Populate preview inventories
-                    if set_craft_input_preview(key, player) == true then
+                    if frontier_craft.set_input_inv_preview("hand", key, player) == true then
                         context.selected_craft = key
                         sfinv.set_page(player, context.page)
                         return

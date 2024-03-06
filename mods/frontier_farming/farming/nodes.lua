@@ -63,7 +63,7 @@ minetest.register_node("farming:soil", {
 	description = S("Soil"),
 	tiles = {"default_dirt.png^farming_soil.png", "default_dirt.png"},
 	drop = "default:dirt",
-	groups = {crumbly=3, not_in_creative_inventory=1, soil=2, grassland = 1, field = 1},
+	groups = {crumbly=3, not_in_creative_inventory=1, soil=3, grassland = 1, field = 1},
 	sounds = default.node_sound_dirt_defaults(),
 	soil = {
 		base = "default:dirt",
@@ -119,6 +119,7 @@ minetest.override_item("default:desert_sand", {
 		wet = "farming:desert_sand_soil_wet"
 	}
 })
+
 minetest.register_node("farming:desert_sand_soil", {
 	description = S("Desert Sand Soil"),
 	drop = "default:desert_sand",
@@ -168,15 +169,4 @@ do
 	stairs.register_slab("straw", recipe, groups, images, S("Straw Slab"),
 		sounds, true)
 end
-
-minetest.register_abm({
-	label = "Farming soil",
-	nodenames = {"group:field"},
-	interval = 180,
-	chance = 4,
-	action = function(pos, node)
-		farming.update_soil(pos, node)
-	end,
-})
-
 

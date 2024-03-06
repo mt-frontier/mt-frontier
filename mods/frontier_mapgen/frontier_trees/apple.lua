@@ -159,9 +159,9 @@ local gen_apple_tree = function ()
 						else
 							table.insert(schem.data, edge_leaves)
 						end
-					else		
+					else
 						table.insert(schem.data, leaves)
-					end 
+					end
 				else
 					table.insert(schem.data, ignore)
 				end
