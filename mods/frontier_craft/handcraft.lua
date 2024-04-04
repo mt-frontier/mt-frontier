@@ -1,4 +1,4 @@
-local input_inv_name = "frontier_craft:hand"
+local input_inv_name = "frontier_craft:inputs"
 local width = 6
 local height = 3
 
@@ -33,7 +33,7 @@ sfinv.override_page("sfinv:crafting", {
 
         local selected = context.selected_craft
         if selected == "" or not selected then
-            frontier_craft.clear_input_inv_preview(player:get_player_name())
+            frontier_craft.clear_input_inv_preview("hand", player:get_player_name())
         else
             frontier_craft.set_input_inv_preview("hand", selected, player)
         end
@@ -50,17 +50,18 @@ sfinv.override_page("sfinv:crafting", {
             button[0.5,0;0.75,1;craft_ten;x10]
             button[1,0;1,1;craft_max;Max]
         ]]
-            .."list[current_player;frontier_craft:output;0,1;2,2;]"
-            .."label[0,3;Replacements]"
-            .."list[current_player;frontier_craft:replacements;0,3.5;2,1;]"..
+            .. "list[current_player;frontier_craft:output;0,1;2,2;]"
+            .. "label[0,3;Replacements]"
+            .. "list[current_player;frontier_craft:replacements;0,3.5;2,1;]"
+            ..
         [[
             container_end[]
 
             container[0,0]
             label[0,0.5;Required Materials]
-            list[detached:frontier_craft;inputs;0,1;2,2;] 
+            list[detached:frontier_craft:inputs;hand;0,1;2,2;] 
             label[0,3;Required Item]
-            list[detached:frontier_craft;required_item;0,3.5;1,1;]
+            list[detached:frontier_craft:inputs;hand:required_item;0,3.5;1,1;]
             container_end[]
             listring[current_player;frontier_craft:output]
             listring[current_player;main]

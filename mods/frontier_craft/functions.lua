@@ -382,7 +382,7 @@ end
 
 -- Build selectable craft page
 frontier_craft.get_craft_selector = function(player, craft_type, invx, invy, width, height, page_num, selected)
-    local formspec = "label[" .. invx-2 .. ",0;Crafting (".. craft_type .."):]"
+    local formspec = "label[" .. invx-2 .. ",0;".. craft_type .." Crafting:]"
     local description = ""
     if selected ~= nil then
         local selected_stack = ItemStack(selected)
@@ -395,11 +395,11 @@ frontier_craft.get_craft_selector = function(player, craft_type, invx, invy, wid
 end
 
 -- Clear input inventory 
-frontier_craft.clear_input_inv_preview = function(playername)
+frontier_craft.clear_input_inv_preview = function(craft_type, playername)
     if playername == nil then
         return
     end
-    local inv = minetest.get_inventory({type="detached", name="frontier_craft"})
+    local inv = minetest.get_inventory({type="detached", name="frontier_craft:inputs"})
     if not inv then
         return
     end
@@ -411,12 +411,14 @@ frontier_craft.clear_input_inv_preview = function(playername)
         end
     end
     -- Clear input inventory
-    if inv:get_size("inputs") > 0 then
-        for i = 1, inv:get_size("inputs") do
-            inv:set_stack("inputs", i, "")
+    if inv:get_size(craft_type) > 0 then
+        for i = 1, inv:get_size(craft_type) do
+            inv:set_stack(craft_type, i, "")
         end
-        inv:set_stack("required_item", 1, "")
+        inv:set_stack(craft_type..":required_item", 1, "")
         return true
+    else
+        inv:set_size(frontier_craft.craft_types[craft_type].max_inputs)
     end
 end
 
@@ -427,25 +429,26 @@ frontier_craft.set_input_inv_preview = function(craft_type, item_name, player)
     end
     local inputs = frontier_craft.registered_crafts[craft_type][item_name]["inputs"]
     local required_item = frontier_craft.registered_crafts[craft_type][item_name]["required_item"]
-    
-    if craft_type == "hand" then
-        local inv = minetest.get_inventory({type="detached", name="frontier_craft"})
-        local size = frontier_craft.craft_types[craft_type].max_inputs
-        if inv:get_size("inputs") ~= size then
-            inv:set_size("inputs", size)
-        end
+    local inv = minetest.get_inventory({type="detached", name="frontier_craft:inputs"})
+
+    --if craft_type == "hand" then
+    local size = frontier_craft.craft_types[craft_type].max_inputs
+    if inv:get_size(craft_type) ~= size then
+        inv:set_size(craft_type, size)
     end
-    for i = 1, inv:get_size("inputs") do
+    --end
+    for i = 1, size do
         if i <= #inputs then
-            inv:set_stack("inputs", i, inputs[i])
+            inv:set_stack(craft_type, i, inputs[i])
         else
-            inv:set_stack("inputs", i, "")
+            inv:set_stack(craft_type, i, "")
         end
     end
+
     if required_item ~= nil then
-        inv:set_stack("required_item", 1, required_item)
+        inv:set_stack(craft_type .. ":required_item", 1, required_item)
     else
-        inv:set_stack("required_item", 1, "")
+        inv:set_stack(craft_type .. ":required_item", 1, "")
     end
     return true
 end

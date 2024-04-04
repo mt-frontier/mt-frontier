@@ -1,8 +1,10 @@
 local forge = {}
+
 forge.settings = {
     -- Minimum fuel to be added before forge can be lit
     min_fuel = minetest.settings:get("forge.min_fuel") or 30
 }
+
 local width, height = 6, 3
 
 forge.update_infotext = function(pos)
@@ -36,13 +38,13 @@ forge.update_formspec = function(pos, playername)
         return
     end
 
-    local input_list = "list[detached:frontier_craft;inputs;0,1;2,2;]"
+    local input_list = "list[detached:frontier_craft:inputs;forge;0,1;2,2;]"
     local fuel_list = "list[nodemeta:"..pos.x..","..pos.y..","..pos.z..";frontier_craft:fuel;0,3.5;1,1;]"
     local page_num = frontier_craft.select_page("forge", meta:get_int("forge:page_num"), width, height)
     local selected = meta:get_string("forge:selected_craft")
     local fuel_percent = math.floor(meta:get_int("burntime")/fire.settings.max_burntime)
     if selected == "" then
-        frontier_craft.clear_input_inv_preview(playername)
+        frontier_craft.clear_input_inv_preview("forge", playername)
     else
         frontier_craft.set_input_inv_preview("forge", selected, minetest.get_player_by_name(playername))
     end
@@ -89,6 +91,7 @@ forge.take_item = function(pos, placer, itemstack)
 end
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
+    print(formname)
     if not string.match(formname, "frontier_craft:forge:") then
         return
     end
@@ -227,6 +230,65 @@ minetest.register_node("frontier_craft:forge_active", {
             return 0
         end
 	end,
+    -- Formspec handling
+    on_receive_fields= function(pos, formname, fields, sender)
+   
+        local player = sender
+
+        if minetest.get_node(pos).name ~= "frontier_craft:forge_active" then
+            minetest.close_formspec(player:get_player_name(), formname)
+            return
+        end
+    
+        local meta = minetest.get_meta(pos)
+        local page_num = meta:get_int("forge:page_num")
+        local selected = meta:get_string("forge:selected_craft")
+    
+        if fields.quit then
+            frontier_craft.clear_input_inv_preview(player:get_player_name())
+        end
+    
+        if fields.next then
+            meta:set_int("forge:page_num", frontier_craft.select_page("forge", page_num + 1, width, height))
+            forge.update_formspec(pos, player:get_player_name())
+            return
+        elseif fields.prev then
+            meta:set_int("forge:page_num", frontier_craft.select_page("forge", page_num - 1, width, height))
+            forge.update_formspec(pos, player:get_player_name())
+            return
+        end
+    
+        if selected ~= "" then
+            if fields.craft_max or fields.craft_ten then
+                local stack = ItemStack(selected)
+                local qty = stack:get_stack_max()
+                local times = math.floor(qty/stack:get_count())
+                if fields.craft_ten then
+                    if times > 10 then
+                        times = 10
+                    end
+                end
+    
+                frontier_craft.perform_craft(player, "forge", selected, times)
+                return
+    
+            elseif fields.craft_one then
+                frontier_craft.perform_craft(player, "forge", selected, 1)
+                return
+            end
+        end
+         -- handle craft selector buttons last
+        for key, _ in pairs(fields) do
+            -- Populate preview inventories
+            print(key)
+            if frontier_craft.registered_crafts["forge"][key] ~= nil then
+                meta:set_string("forge:selected_craft", key)
+                frontier_craft.set_input_inv_preview("forge", key, player)
+                forge.update_formspec(pos, player:get_player_name())
+                return
+            end
+        end
+    end
 })
 
 minetest.register_node("frontier_craft:forge", {

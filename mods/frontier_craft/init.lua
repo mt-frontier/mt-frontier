@@ -1,5 +1,9 @@
+
+local mp = minetest.get_modpath("frontier_craft")
+
 -- Manual crafting library
 frontier_craft = {}
+
 frontier_craft.settings = {
     item_entity_offset = 0.125
 }
@@ -24,13 +28,11 @@ for craft_type, _ in pairs(frontier_craft.craft_types) do
     frontier_craft.craft_index[craft_type] = {}
 end
 
-local mp = minetest.get_modpath("frontier_craft")
-
--- crafting inventories
+-- create crafting system inventories
 
 minetest.register_on_joinplayer(function(player, last_login)
-	local player_inv = minetest.get_inventory({type="player", name=player:get_player_name()})
-    local input_inv = minetest.create_detached_inventory("frontier_craft",
+    -- Input preview inventories
+    local input_inv = minetest.create_detached_inventory("frontier_craft:inputs",
         {
             allow_move = function()
                 return 0
@@ -44,9 +46,14 @@ minetest.register_on_joinplayer(function(player, last_login)
         },
         player:get_player_name()
     )
-    input_inv:set_size('inputs', 4)
-    input_inv:set_size('required_item', 1)
-	-- Check for player craft inventories
+
+    for craft_type, craft_properties in pairs(frontier_craft.craft_types) do
+        input_inv:set_size(craft_type, craft_properties.max_inputs)
+        input_inv:set_size(craft_type .. ":required_item", 1)
+    end
+
+    -- Output inventories are particular to player
+	local player_inv = minetest.get_inventory({type="player", name=player:get_player_name()})
 	if not player_inv:get_list("frontier_craft:output") then
 		player_inv:set_size('frontier_craft:output', 4)
 		player_inv:set_size('frontier_craft:replacements', 2)
