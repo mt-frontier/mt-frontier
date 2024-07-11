@@ -2,44 +2,75 @@ ts_furniture = {}
 
 -- If true, you can sit on chairs and benches, when right-click them.
 ts_furniture.enable_sitting = true
+ts_furniture.globalstep = minetest.settings:get_bool("ts_furniture.globalstep", true)
 
--- The following code is from "Get Comfortable [cozy]" (by everamzah; published under WTFPL).
+-- The following code is from "Get Comfortable [cozy]" (by everamzah; published under WTFPL)
 -- Thomas S. modified it, so that it can be used in this mod
-minetest.register_globalstep(function(dtime)
-	local players = minetest.get_connected_players()
-	for i = 1, #players do
-		local name = players[i]:get_player_name()
-		if player_api.player_attached[name] and not players[i]:get_attach() and
-		(players[i]:get_player_control().up == true or
-		players[i]:get_player_control().down == true or
-		players[i]:get_player_control().left == true or
-		players[i]:get_player_control().right == true or
-		players[i]:get_player_control().jump == true) then
-			players[i]:set_eye_offset({ x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
-			players[i]:set_physics_override(1, 1, 1)
-			player_api.player_attached[name] = false
-			player_api.set_animation(players[i], "stand", 30)
+if ts_furniture.enable_sitting then
+	ts_furniture.sit = function(pos, _, player)
+		local name = player:get_player_name()
+		if not player_api.player_attached[name] then
+			if vector.length(player:get_velocity()) > 0.5 then
+				minetest.chat_send_player(player:get_player_name(), 'You can only sit down when you are not moving.')
+				return
+			end
+			player:move_to(pos)
+			player:set_eye_offset({x = 0, y = -7, z = 2}, {x = 0, y = 0, z = 0})
+			if has_player_monoids then
+				player_monoids.speed:add_change(player, 0, "ts_furniture:sit")
+				player_monoids.jump:add_change(player, 0, "ts_furniture:sit")
+				player_monoids.gravity:add_change(player, 0, "ts_furniture:sit")
+			else
+				player:set_physics_override({speed = 0, jump = 0, gravity = 0})
+			end
+			player_api.player_attached[name] = true
+			minetest.after(0.1, function()
+				if player then
+					player_api.set_animation(player, "sit" , 30)
+				end
+			end)
+		else
+			ts_furniture.stand(player, name)
 		end
 	end
-end)
 
+	ts_furniture.up = function(_, _, player)
+		local name = player:get_player_name()
+		if player_api.player_attached[name] then
+			ts_furniture.stand(player, name)
+		end
+	end
 
-ts_furniture.sit = function(name, pos)
-	local player = minetest.get_player_by_name(name)
-	if player_api.player_attached[name] then
-		player:set_eye_offset({ x = 0, y = 0, z = 0 }, { x = 0, y = 0, z = 0 })
-		player:set_physics_override({speed=1, jump=1, gravity=1})
+	ts_furniture.stand = function(player, name)
+		--player:set_eye_offset({x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
+		if has_player_monoids then
+			player_monoids.speed:del_change(player, "ts_furniture:sit")
+			player_monoids.jump:del_change(player, "ts_furniture:sit")
+			player_monoids.gravity:del_change(player, "ts_furniture:sit")
+		else
+			player:set_physics_override({speed = 1, jump = 1, gravity = 1})
+		end
 		player_api.player_attached[name] = false
 		player_api.set_animation(player, "stand", 30)
-	else
-		player:move_to(pos)
-		player:set_eye_offset({ x = 0, y = -5, z = 2 }, { x = 0, y = 0, z = 0 })
-		player:set_physics_override({speed=0, jump=0, gravity=0})
-		player_api.player_attached[name] = true
-		player_api.set_animation(player, "sit", 30)
+	end
+
+	-- The player will stand at the beginning of the movement
+	if ts_furniture.globalstep and not minetest.get_modpath("cozy") then
+		minetest.register_globalstep(function(dtime)
+			local players = minetest.get_connected_players()
+			for i = 1, #players do
+				local player = players[i]
+				local name = player:get_player_name()
+				local ctrl = player:get_player_control()
+				if default.player_attached[name] and not player:get_attach() and
+				(ctrl.up or ctrl.down or ctrl.left or ctrl.right or ctrl.jump) then
+					ts_furniture.up(nil, nil, player)
+				end		
+			end
+		end)
 	end
 end
--- end of cozy-code
+-- End of [cozy] code
 
 local furnitures = {
 	["chair"] = {
@@ -194,7 +225,7 @@ function ts_furniture.register_furniture(recipe, description, texture)
 		
 		if def.sitting and ts_furniture.enable_sitting then
 			def.on_rightclick = function(pos, node, player, itemstack, pointed_thing)
-				ts_furniture.sit(player:get_player_name(), pos)
+				ts_furniture.sit(pos, _, player)
 			end
 		elseif def.storage and def.toggle then
 			local slots = def.storage

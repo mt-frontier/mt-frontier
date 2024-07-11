@@ -17,7 +17,7 @@ local wigwam_loot = {
 wigwam_loot = buildings.sort_loot(wigwam_loot)
 
 minetest.register_node("buildings:wigwam_seed", {
-	description = "Placeholder for checking coditions for Cabin spawning",
+	description = "Placeholder for checking conditions for Cabin spawning",
 	drawtype = "airlike",
 	groups = {not_in_creative_inventory = 1},
 })

@@ -45,7 +45,7 @@ minetest.register_decoration({
 	},]]--
 	biomes = {"coniferous_forest", "pine_savanna"},
 })
-
+			
 minetest.register_lbm({
 	label = "Cabin Spawn",
 	name = "buildings:spawn_cabin",
