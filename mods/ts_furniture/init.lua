@@ -42,7 +42,7 @@ if ts_furniture.enable_sitting then
 	end
 
 	ts_furniture.stand = function(player, name)
-		--player:set_eye_offset({x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
+		player:set_eye_offset({x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
 		if has_player_monoids then
 			player_monoids.speed:del_change(player, "ts_furniture:sit")
 			player_monoids.jump:del_change(player, "ts_furniture:sit")
