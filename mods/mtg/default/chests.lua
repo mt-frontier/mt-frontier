@@ -268,23 +268,23 @@ function default.chest.register_chest(name, d)
 	minetest.register_node("default:" .. name, def_closed)
 	minetest.register_node("default:" .. name .. "_open", def_opened)
 
-	-- convert old chests to this new variant
-	minetest.register_lbm({
-		label = "update chests to opening chests",
-		name = "default:upgrade_" .. name .. "_v2",
-		nodenames = {"default:" .. name},
-		action = function(pos, node)
-			local meta = minetest.get_meta(pos)
-			meta:set_string("formspec", nil)
-			local inv = meta:get_inventory()
-			local list = inv:get_list("default:chest")
-			if list then
-				inv:set_size("main", 8*4)
-				inv:set_list("main", list)
-				inv:set_list("default:chest", nil)
-			end
-		end
-	})
+	-- -- convert old chests to this new variant
+	-- minetest.register_lbm({
+	-- 	label = "update chests to opening chests",
+	-- 	name = "default:upgrade_" .. name .. "_v2",
+	-- 	nodenames = {"default:" .. name},
+	-- 	action = function(pos, node)
+	-- 		local meta = minetest.get_meta(pos)
+	-- 		meta:set_string("formspec", nil)
+	-- 		local inv = meta:get_inventory()
+	-- 		local list = inv:get_list("default:chest")
+	-- 		if list then
+	-- 			inv:set_size("main", 8*4)
+	-- 			inv:set_list("main", list)
+	-- 			inv:set_list("default:chest", nil)
+	-- 		end
+	-- 	end
+	-- })
 end
 
 default.chest.register_chest("chest", {
